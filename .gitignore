@@ -1,5 +1,6 @@
 .env*
 node_modules
 watchAccounts.json
-sync.sh
+sync*
 ecosystem.config.js
+

@@ -11,7 +11,7 @@ async function init() {
       const existingus = (await api.rpc.get_account(account)).cpu_limit.available
       const availableMs = existingus/1000
       console.log("Available Ms:", Number(availableMs).toLocaleString())
-      if (availableMs > 10) continue
+      if (availableMs > 20) continue
       const transact = await api.transact({
         actions: [{
           account: 'eosio',
@@ -22,7 +22,7 @@ async function init() {
             receiver: account,
             days: 1,
             net_frac: 0,
-            cpu_frac: 2000000000,
+            cpu_frac: 3000000000,
             max_payment: "0.1000 EOS"
           },
         }]
