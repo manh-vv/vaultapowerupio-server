@@ -8,9 +8,10 @@ async function init() {
   try {
     for (const account of watchAccounts) {
       console.log(account)
-      const existingCPU = (await api.rpc.get_account(account)).cpu_limit.available
-      console.log("Existing CPU:", Number(existingCPU).toLocaleString())
-      if (existingCPU > 10000) continue
+      const existingus = (await api.rpc.get_account(account)).cpu_limit.available
+      const availableMs = existingus/1000
+      console.log("Available Ms:", Number(availableMs).toLocaleString())
+      if (availableMs > 10) continue
       const transact = await api.transact({
         actions: [{
           account: 'eosio',
