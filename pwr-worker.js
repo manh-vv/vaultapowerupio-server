@@ -27,8 +27,8 @@ async function doAction(name, data, account, actor,permission) {
   try {
     if (!data) data = {}
     if (!account) account = contractAccount
-    if (!actor) actor = env.workerAccount
-    if (!permission) permission = env.workerPermission
+    if (!actor) actor = 'eospowerupio'
+    if (!permission) permission = 'workers'
     console.log("Do Action:", name, data)
     const authorization = [{ actor, permission }]
     const result = await api.transact({
