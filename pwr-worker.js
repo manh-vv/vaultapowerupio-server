@@ -45,28 +45,35 @@ async function doAction(name, data, account, actor,permission) {
   }
 }
 
-async function autoPowerup(owner,watch){
+async function autoPowerup(owner,watch,net){
   let cpu_frac = powerup.cpu.frac_by_ms(sample, watch.powerup_quantity_ms)
-  // console.log(cpu_frac);
-  // let net_frac = parseInt(cpu_frac /1e7)
-  let net_frac = 0
-  // console.log(net_frac);
-  const max_payment = "0.1000 EOS"
-  await doAction('autopowerup',{payer:owner,watch_account:watch.account,net_frac,cpu_frac,max_payment})
+  let net_frac = parseInt(cpu_frac / 2e2)
+
+  if (net) {
+    net_frac *= 4
+    cpu_frac /= 4
+  }
+
+  const max_payment = "0.2000 EOS"
+  await doAction('autopowerup',{payer:owner,watch_account:watch.account,net_frac:parseInt(net_frac),cpu_frac:parseInt(cpu_frac),max_payment})
 }
 async function autoBuyRam(payer,watch) {
   await doAction('autobuyram',{payer,watch_account:watch.account})
 }
 
-async function getAccountMs(account) {
-  const existingus = (await api.rpc.get_account(account)).cpu_limit.available
-  console.log("Remaining Ms:",existingus/1000);
-  return existingus / 1000
+async function getAccountBw(account) {
+  const resources = (await api.rpc.get_account(account))
+  console.log(resources);
+  const msAvailable = resources.cpu_limit.available / 1000
+  console.log("Remaining CPU Ms:",msAvailable);
+  const netAvailable = resources.net_limit.available / 1000
+  console.log("Remaining Net kb:",netAvailable);
+  return {msAvailable,netAvailable}
 }
 
 async function getAccountKb(account) {
   const existingBytes = (await api.rpc.get_account(account)).total_resources.ram_bytes
-  console.log("Remaining Kb:",existingBytes/1000);
+  console.log("Remaining RAM Kb:",existingBytes/1000);
   return existingBytes / 1000
 }
 
@@ -81,10 +88,14 @@ async function init(){
       console.log(owner)
       const watchAccounts = shuffle((await api.rpc.get_table_rows({code:'eospowerupio',scope:owner,table:"watchlist",limit:-1})).rows.filter(el => el.active == 1))
       for (watch of watchAccounts) {
+        // await autoPowerup(owner,watch)
+        // await autoPowerup(owner,watch,true)
+        // continue
         console.log('Checking:',watch.account);
         if(watch.min_cpu_ms > 0) {
-          const msAvailable = await getAccountMs(watch.account)
+          const {msAvailable,netAvailable} = await getAccountBw(watch.account)
           if (msAvailable < watch.min_cpu_ms) await autoPowerup(owner,watch)
+          if (netAvailable < 200) await autoPowerup(owner,watch,true)
          }
         if(watch.min_kb_ram > 0) {
           const kbAvailable = await getAccountKb(watch.account)
