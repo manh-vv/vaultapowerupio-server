@@ -9,6 +9,7 @@ const tapos = {
   expireSeconds: 10,
   broadcast: true
 }
+
 function init(keys, apiurl) {
   if (!keys) keys = env.keys
   const signatureProvider = new JsSignatureProvider(keys)

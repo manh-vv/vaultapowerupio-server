@@ -2,9 +2,7 @@ const env = require('./.env')
 const { api, rpc } = require('./eosjs')(env.keys, 'https://eos.greymass.com')
 const ms = require('ms')
 const watchAccounts = require('./watchAccounts.json')
-const watcher = 'eospowerupio'
 const random = (min, max) => Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1)) + Math.ceil(min)
-
 
 async function init() {
   try {
@@ -17,9 +15,9 @@ async function init() {
         actions: [{
           account: 'eosio',
           name: 'powerup',
-          authorization: [{ actor: watcher, permission: 'powerup' }],
+          authorization: [{ actor: env.workerAccount, permission: env.workerPermission }],
           data: {
-            payer: watcher,
+            payer: env.workerAccount,
             receiver: account,
             days: 1,
             net_frac: 0,
@@ -29,7 +27,7 @@ async function init() {
         }]
       }, {
         blocksBehind: 12,
-        expireSeconds: random(10,100),
+        expireSeconds: 10,
         broadcast: true
       }).catch(er => console.log(er.toString()))
       if (transact) console.log(transact.transaction_id)

@@ -2,3 +2,4 @@
 node_modules
 watchAccounts.json
 sync.sh
+ecosystem.config.js
