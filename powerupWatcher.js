@@ -21,7 +21,7 @@ async function init() {
             payer: env.workerAccount,
             receiver: account,
             days: 1,
-            net_frac: 0,
+            net_frac: 10000,
             cpu_frac: 3000000000,
             max_payment: "0.1000 EOS"
           },
