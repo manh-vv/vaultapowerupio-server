@@ -7,6 +7,9 @@ const ms = require('ms')
 const contractAccount = env.contractAccount
 
 var sample
+/**
+ * @type(PowerUpState)
+ */
 var powerup 
 
 
@@ -46,8 +49,9 @@ async function doAction(name, data, account, actor,permission) {
 }
 
 async function autoPowerup(owner,watch,net){
+  console.log("Create Powerup for "+ watch.powerup_quantity_ms + " Ms");
   let cpu_frac = powerup.cpu.frac_by_ms(sample, watch.powerup_quantity_ms)
-  let net_frac = parseInt(cpu_frac / 2e2)
+  let net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/50,0.5))
 
   if (net) {
     net_frac *= 4
@@ -63,7 +67,7 @@ async function autoBuyRam(payer,watch) {
 
 async function getAccountBw(account) {
   const resources = (await api.rpc.get_account(account))
-  console.log(resources);
+  // console.log(resources);
   const msAvailable = resources.cpu_limit.available / 1000
   console.log("Remaining CPU Ms:",msAvailable);
   const netAvailable = resources.net_limit.available / 1000
@@ -82,7 +86,6 @@ async function init(){
     sample = await resources.getSampledUsage()   
     powerup = await resources.v1.powerup.get_state()
     const watchScopes = shuffle((await api.rpc.get_table_by_scope({code:"eospowerupio",table:"watchlist",limit:-1})).rows.filter(el => el.count > 0).map(el => el.scope))
-
     for (owner of watchScopes) {
       powerup = await resources.v1.powerup.get_state()
       console.log(owner)
