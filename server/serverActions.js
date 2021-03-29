@@ -22,7 +22,7 @@ function checkValid(accountName) {
 module.exports = {
   async freePowerup(accountName){
     if (checkValid(accountName)) {
-      const result = await powerup(pwrAccount,0.5,accountName,'powerup','0.005')
+      const result = await powerup(pwrAccount,5,accountName,'powerup','0.005')
       return {result}
     }
     else return {error:"try again later"}

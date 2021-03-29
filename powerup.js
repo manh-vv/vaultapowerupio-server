@@ -1,13 +1,28 @@
 const { Resources } = require('@greymass/eosio-resources')
 const fetch = require('node-fetch')
+const env = require('./.env.js')
 const resources = new Resources({ fetch, url: 'https://eos.greymass.com' })
-const { api, rpc } = require('./eosjs')(null, "https://eos.greymass.com")
+const { api, rpc } = require('./eosjs')(env.keys, env.endpoint)
+const sleep = ms => new Promise(res => setTimeout(res, ms))
+
+
 const tapos = {
   blocksBehind: 16,
   expireSeconds: 30,
   broadcast: true
 }
 const fracPwr = 1e8
+
+async function getAccountBw(account) {
+  const resources = (await api.rpc.get_account(account))
+  // console.log(resources);
+  const msAvailable = resources.cpu_limit.available / 1000
+  console.log("Remaining CPU Ms:",msAvailable);
+  const netAvailable = resources.net_limit.available / 1000
+  console.log("Remaining Net kb:",netAvailable);
+  return {msAvailable,netAvailable}
+}
+
 const methods = {
   /**
    * 
@@ -25,20 +40,18 @@ const methods = {
       if (!payerPermission) payerPermission = 'active'
       if (!maxPayment) maxPayment = 1
       console.log('Receiver:', receiver)
-      // return
-      quantityCpu = parseInt(parseFloat(quantity) * 9.999)
-      quantityNet = parseInt(parseFloat(quantity) * 0.001)
-      // console.log(quantity);
-      // return 
+      await getAccountBw(receiver)
+      quantityCpu = parseFloat(quantity) * 0.999
+      quantityNet = parseFloat(quantity) * 0.001
+      
       const powerup = await resources.v1.powerup.get_state()
       const sample = await resources.getSampledUsage()    
       
       let cpu_frac = powerup.cpu.frac_by_ms(sample, quantityCpu)
-      console.log(cpu_frac);
-      let net_frac = 0
-      // let net_frac = powerup.net.frac_by_bytes(sample, 500)
-      // console.log(net_frac);
-
+      console.log('cpu_frac:',cpu_frac);
+      let net_frac = powerup.net.frac_by_kb(sample, Math.max(quantityCpu/50,0.5))
+      console.log('net_frac:',net_frac)
+      // return
       cpu_frac = parseInt(cpu_frac * 1)
       net_frac = parseInt(net_frac * 1)
       const pwrAction = {
@@ -54,7 +67,12 @@ const methods = {
 
       const result = await api.transact({ actions: [pwrAction]},tapos)
       console.log(`https://bloks.io/transaction/${result.transaction_id}`)
+      await getAccountBw(receiver)
+
       return result.transaction_id
+
+      const accountData = await api.rpc.get_account(receiver)
+      console.log(accountData);
 
       } catch (error) {
         console.error(error.toString())

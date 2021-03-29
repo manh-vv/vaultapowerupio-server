@@ -54,7 +54,7 @@ async function autoPowerup(owner,watch,net){
   let net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/50,0.5))
 
   if (net) {
-    net_frac *= 4
+    net_frac *= 2
     cpu_frac /= 4
   }
 
