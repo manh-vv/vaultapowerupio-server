@@ -67,6 +67,7 @@ const methods = {
 
       const result = await api.transact({ actions: [pwrAction]},tapos)
       console.log(`https://bloks.io/transaction/${result.transaction_id}`)
+      // await sleep(1000)
       await getAccountBw(receiver)
 
       return result.transaction_id

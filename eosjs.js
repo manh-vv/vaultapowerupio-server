@@ -10,6 +10,10 @@ const tapos = {
   broadcast: true
 }
 
+// const pickEndpoint(){
+
+// }
+
 function init(keys, apiurl) {
   if (!keys) keys = env.keys
   const signatureProvider = new JsSignatureProvider(keys)
