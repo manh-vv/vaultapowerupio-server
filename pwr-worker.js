@@ -33,7 +33,7 @@ async function doAction(name, data, account, actor,permission) {
     if (!actor) actor = 'eospowerupio'
     if (!permission) permission = 'workers'
     console.log("Do Action:", name, data)
-    const authorization = [{ actor, permission }]
+    const authorization = [{actor:env.workerAccount,permission:env.workerPermission},{ actor, permission }]
     const result = await api.transact({
       // "delay_sec": 0,
       actions: [{ account, name, data, authorization }]
