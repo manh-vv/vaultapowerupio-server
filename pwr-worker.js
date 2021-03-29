@@ -55,7 +55,7 @@ async function autoPowerup(owner,watch,net){
 
   if (net) {
     net_frac *= 2
-    cpu_frac /= 4
+    cpu_frac /= 2
   }
 
   const max_payment = "0.2000 EOS"
@@ -98,7 +98,7 @@ async function init(){
         if(watch.min_cpu_ms > 0) {
           const {msAvailable,netAvailable} = await getAccountBw(watch.account)
           if (msAvailable < watch.min_cpu_ms) await autoPowerup(owner,watch)
-          if (netAvailable < 200) await autoPowerup(owner,watch,true)
+          if (netAvailable < watch.min_cpu_ms/10) await autoPowerup(owner, watch, true)
          }
         if(watch.min_kb_ram > 0) {
           const kbAvailable = await getAccountKb(watch.account)
