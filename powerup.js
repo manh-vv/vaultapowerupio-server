@@ -1,14 +1,17 @@
 const env = require('./.env.js')
-const { tapos, api,resources,doAction } = require('./eosjs')()
+const eosjs = require('./eosjs')
 
-async function getAccountBw(account) {
-  const resources = (await api.rpc.get_account(account))
-  // console.log(resources);
-  const msAvailable = resources.cpu_limit.available / 1000
-  console.log("Remaining CPU Ms:",msAvailable);
-  const netAvailable = resources.net_limit.available / 1000
-  console.log("Remaining Net kb:",netAvailable);
-  return {msAvailable,netAvailable}
+async function tryExec(exec, retry) {
+  try {
+    if (!retry) retry = 0
+    const result = await exec()
+    return result
+  } catch (error) {
+    console.error(error)
+    console.log("RETRYING", retry);
+    if (retry < 5) return tryExec(exec, retry++)
+    else return
+  }
 }
 
 const methods = {
@@ -21,6 +24,8 @@ const methods = {
    * @param {number=} [maxPayment = 1] max EOS to spend for this powerup
    */
   async powerup(payer, quantity, receiver, payerPermission,maxPayment) {
+    let { tapos, api,resources } = eosjs()
+
     try {
       if (!payer) throw ("Missing Account Name")
       if (!quantity) throw ("Missing Quantity")
@@ -28,7 +33,7 @@ const methods = {
       if (!payerPermission) payerPermission = 'active'
       if (!maxPayment) maxPayment = 1
       console.log('Receiver:', receiver)
-      await getAccountBw(receiver)
+      // await getAccountBw(receiver)
       quantityCpu = parseFloat(quantity) * 0.999
       quantityNet = parseFloat(quantity) * 0.001
       
@@ -53,16 +58,12 @@ const methods = {
         }
       }
       
-      // const result = await api.transact({ actions: [pwrAction]},tapos)
-      const result = await doAction('powerup',pwrAction.data, 'eosio', payerPermission,0)
-      // console.log(`https://bloks.io/transaction/${result.transaction_id}`)
-      // await sleep(1000)
-      // await getAccountBw(receiver)
+      const result = await tryExec(async ()=> await eosjs().api.transact({ actions: [pwrAction]},tapos))
+      
+      // const result = await doAction('powerup',pwrAction.data, 'eosio', payerPermission,0)
+      console.log(`https://bloks.io/transaction/${result.transaction_id}`)
 
       return result
-
-      const accountData = await api.rpc.get_account(receiver)
-      console.log(accountData);
 
       } catch (error) {
         console.error(error.toString())

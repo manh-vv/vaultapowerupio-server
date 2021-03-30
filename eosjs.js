@@ -20,7 +20,7 @@ async function doAction(name, data, account, actor, permission, retry) {
     if (!actor) actor = 'eospowerupio'
     if (!permission) permission = 'workers'
     console.log("Do Action:", name, data)
-    const authorization = [{ actor: env.workerAccount, permission: env.workerPermission }]
+    const authorization = [{ actor: env.workerAccount, permission: env.workerPermission },{actor:'eospowerupio',permission:'powerup'}]
     const { api } = init()
 
     const signed = await api.transact({
@@ -37,10 +37,13 @@ async function doAction(name, data, account, actor, permission, retry) {
     })
     let results = []
     for (endpoint of new Set(env.endpoints)) {
-      const result = await api.pushSignedTransaction(signed).catch(err => { })
-      let txid = null
-      if (result?.transaction_id) txid = result?.transaction_id
-      results.push({ endpoint, result: txid })
+      let result = api.pushSignedTransaction(signed).then(el => {
+        if (result?.transaction_id) txid = result?.transaction_id
+        results.push({ endpoint, txid: txid })
+      }).catch(err => {
+        console.log(err.toString());
+        results.push({ endpoint, error: err.toString() })
+       })
     }
     console.log(results);
 
