@@ -1,5 +1,5 @@
 const env = require('./.env.js')
-const { tapos, api,resources } = require('./eosjs')()
+const { tapos, api,resources,doAction } = require('./eosjs')()
 
 async function getAccountBw(account) {
   const resources = (await api.rpc.get_account(account))
@@ -52,13 +52,14 @@ const methods = {
           payer, receiver
         }
       }
-
-      const result = await api.transact({ actions: [pwrAction]},tapos)
-      console.log(`https://bloks.io/transaction/${result.transaction_id}`)
+      
+      // const result = await api.transact({ actions: [pwrAction]},tapos)
+      const result = await doAction('powerup',pwrAction.data, 'eosio', payerPermission,0)
+      // console.log(`https://bloks.io/transaction/${result.transaction_id}`)
       // await sleep(1000)
-      await getAccountBw(receiver)
+      // await getAccountBw(receiver)
 
-      return result.transaction_id
+      return result
 
       const accountData = await api.rpc.get_account(receiver)
       console.log(accountData);
