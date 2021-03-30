@@ -37,9 +37,9 @@ async function doAction(name, data, account, actor, permission, retry) {
     })
     let results = []
     for (endpoint of new Set(env.endpoints)) {
-      let result = api.pushSignedTransaction(signed).then(el => {
-        var txid = null
-        if (result?.transaction_id) txid = result?.transaction_id
+      api.pushSignedTransaction(signed)
+      .then(el => {
+        var txid = el.transaction_id
         results.push({ endpoint, txid: txid })
       }).catch(err => {
         console.log(err.toString());
