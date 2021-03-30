@@ -54,10 +54,10 @@ async function autoPowerup(owner,watch,net){
   let cpu_frac = 0
 
   if(net) {
-    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/10,1))
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/5,1))
     cpu_frac = powerup.cpu.frac_by_ms(sample, Match.max(watch.powerup_quantity_ms/2,2))
   } else {
-    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/30,1))
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/50,1))
     cpu_frac = powerup.cpu.frac_by_ms(sample, Match.max(watch.powerup_quantity_ms,2))
   }
 
@@ -93,7 +93,7 @@ async function init(){
   try {
     sample = await resources.getSampledUsage()   
     powerup = await resources.v1.powerup.get_state()
-    const watchScopes = shuffle((await api.rpc.get_table_by_scope({code:"eospowerupio",table:"watchlist",limit:-1})).rows.filter(el => el.count > 0).map(el => el.scope))
+    const watchScopes = shuffle((await api.rpc.get_table_by_scope({code:"eospowerupio",table:"account",limit:-1})).rows.filter(el => el.count > 0).map(el => el.scope))
     for (owner of watchScopes) {
       powerup = await resources.v1.powerup.get_state()
       console.log(owner)
@@ -108,7 +108,7 @@ async function init(){
           if (msAvailable <= watch.min_cpu_ms) await autoPowerup(owner,watch)
           if (netAvailable <= watch.min_cpu_ms/3) await autoPowerup(owner, watch, true)
          }
-        if(watch.min_kb_ram > 0) {
+        if(watch.min_kb_ram > 0 && watch.buy_ram_quantity_kb > 0) {
           const kbAvailable = await getAccountKb(watch.account)
           if (kbAvailable <= watch.min_kb_ram) await autoBuyRam(owner,watch)
         }
