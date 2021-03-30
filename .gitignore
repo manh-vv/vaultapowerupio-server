@@ -2,5 +2,6 @@
 node_modules
 watchAccounts.json
 sync*
+allSync.sh
 ecosystem.config.js
 
