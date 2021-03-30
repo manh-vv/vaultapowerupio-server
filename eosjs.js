@@ -8,8 +8,8 @@ const { Resources } = require('@greymass/eosio-resources')
 const contractAccount = env.contractAccount
 let api
 const tapos = {
-  blocksBehind: 6,
-  expireSeconds: 10,
+  blocksBehind: 12,
+  expireSeconds: 30,
   broadcast: true
 }
 async function doAction(name, data, account, actor,permission) {
@@ -20,17 +20,32 @@ async function doAction(name, data, account, actor,permission) {
     if (!permission) permission = 'workers'
     console.log("Do Action:", name, data)
     const authorization = [{actor:env.workerAccount,permission:env.workerPermission},{ actor, permission }]
-    const result = await api.transact({
+    const {api} = init()
+
+    const signed = await api.transact({
       // "delay_sec": 0,
       actions: [{ account, name, data, authorization }]
-    }, tapos)
-    const txid = result.transaction_id
-    console.log(`https://bloks.io/transaction/` + txid)
+    }, {
+      blocksBehind: 12,
+      expireSeconds: 30,
+      broadcast: false
+    })
+    let results = []
+    for (endpoint of new Set(env.endpoints)) {
+      const result = await api.pushSignedTransaction(signed).catch(err => {})
+      let txid = null
+      if(result?.transaction_id) txid = result?.transaction_id
+      results.push({endpoint,result:txid})
+    }
+    console.log(results);
+
+    // const txid = result.transaction_id
+    // console.log(`https://bloks.io/transaction/` + txid)
     // console.log(txid)
-    return result
+    return results
   } catch (error) {
-    console.error(error.toString())
-    if (error.json) console.error("Logs:", error.json?.error?.details[1]?.message)
+    console.error('DoAction Error:',error.toString())
+    throw(error)
   }
 }
 

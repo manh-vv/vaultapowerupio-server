@@ -37,13 +37,13 @@ async function autoPowerup(owner, watch, net) {
     cpu_frac = powerup.cpu.frac_by_ms(sample, Math.max(watch.powerup_quantity_ms, 2))
   }
 
-  const max_payment = "0.2000 EOS"
-  await doAction('autopowerup', { payer: owner, watch_account: watch.account, net_frac: parseInt(net_frac), cpu_frac: parseInt(cpu_frac), max_payment })
+  const max_payment = "2.2000 EOS"
+  doAction('autopowerup', { payer: owner, watch_account: watch.account, net_frac: parseInt(net_frac), cpu_frac: parseInt(cpu_frac), max_payment })
 
 }
 async function autoBuyRam(payer, watch) {
   let { doAction } = eosjs()
-  await doAction('autobuyram', { payer, watch_account: watch.account })
+  doAction('autobuyram', { payer, watch_account: watch.account })
 }
 
 async function getAccountBw(account) {
