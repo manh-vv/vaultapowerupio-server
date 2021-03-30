@@ -50,16 +50,20 @@ async function doAction(name, data, account, actor,permission) {
 
 async function autoPowerup(owner,watch,net){
   console.log("Create Powerup for "+ watch.powerup_quantity_ms + " Ms");
-  let cpu_frac = powerup.cpu.frac_by_ms(sample, watch.powerup_quantity_ms)
-  let net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/30,0.5))
+  let net_frac = 0
+  let cpu_frac = 0
 
-  if (net) {
-    net_frac *= 4
-    cpu_frac /= 4
+  if(net) {
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/10,1))
+    cpu_frac = powerup.cpu.frac_by_ms(sample, Match.max(watch.powerup_quantity_ms/2,2))
+  } else {
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/30,1))
+    cpu_frac = powerup.cpu.frac_by_ms(sample, Match.max(watch.powerup_quantity_ms,2))
   }
 
   const max_payment = "0.2000 EOS"
   await doAction('autopowerup',{payer:owner,watch_account:watch.account,net_frac:parseInt(net_frac),cpu_frac:parseInt(cpu_frac),max_payment})
+
 }
 async function autoBuyRam(payer,watch) {
   await doAction('autobuyram',{payer,watch_account:watch.account})
@@ -76,9 +80,13 @@ async function getAccountBw(account) {
 }
 
 async function getAccountKb(account) {
-  const existingBytes = (await api.rpc.get_account(account)).total_resources.ram_bytes
-  console.log("Remaining RAM Kb:",existingBytes/1000);
-  return existingBytes / 1000
+  const resources = (await api.rpc.get_account(account))
+  const quota = resources.ram_quota
+  const usage = resources.ram_usage
+  const available = quota - usage
+  const remainingKb = available/1000
+  console.log('RAM kb Remaining:',remainingKb);
+  return remainingKb
 }
 
 async function init(){
@@ -97,12 +105,12 @@ async function init(){
         console.log('Checking:',watch.account);
         if(watch.min_cpu_ms > 0) {
           const {msAvailable,netAvailable} = await getAccountBw(watch.account)
-          if (msAvailable < watch.min_cpu_ms) await autoPowerup(owner,watch)
-          if (netAvailable < watch.min_cpu_ms/5) await autoPowerup(owner, watch, true)
+          if (msAvailable <= watch.min_cpu_ms) await autoPowerup(owner,watch)
+          if (netAvailable <= watch.min_cpu_ms/3) await autoPowerup(owner, watch, true)
          }
         if(watch.min_kb_ram > 0) {
           const kbAvailable = await getAccountKb(watch.account)
-          if (kbAvailable < watch.min_kb_ram) await autoBuyRam(owner,watch)
+          if (kbAvailable <= watch.min_kb_ram) await autoBuyRam(owner,watch)
         }
       }
     }

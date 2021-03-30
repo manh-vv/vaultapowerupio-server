@@ -57,7 +57,7 @@ async function autoPowerup(owner, watch, net) {
   if (net) {
     console.log('Low NET Powerup Triggered!');
     net_frac *= 3
-    cpu_frac /= 4
+    cpu_frac = 0
   }
 
   const max_payment = "0.2000 EOS"
@@ -78,9 +78,13 @@ async function getAccountBw(account) {
 }
 
 async function getAccountKb(account) {
-  const existingBytes = (await api.rpc.get_account(account)).total_resources.ram_bytes
-  console.log("Remaining RAM Kb:", existingBytes / 1000);
-  return existingBytes / 1000
+  const resources = (await api.rpc.get_account(account))
+  const quota = resources.ram_quota
+  const usage = resources.ram_usage
+  const available = quota - usage
+  const remainingKb = available/1000
+  console.log('RAM kb Remaining:',remainingKb);
+  return remainingKb
 }
 
 async function init(owner) {
