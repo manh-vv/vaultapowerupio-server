@@ -40,6 +40,7 @@ async function doAction(name, data, account, actor, permission, retry) {
       api.pushSignedTransaction(signed)
       .then(el => {
         var txid = el.transaction_id
+        console.log('Pushed Transaction:',txid);
         results.push({ endpoint, txid: txid })
       }).catch(err => {
         console.log(err.toString());
