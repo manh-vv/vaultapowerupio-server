@@ -31,10 +31,10 @@ async function autoPowerup(owner, watch, net) {
 
   if (net) {
     console.log('Performing NET Powerup');
-    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms / 5, 1))
-    cpu_frac = powerup.cpu.frac_by_ms(sample, Math.max(watch.powerup_quantity_ms / 2, 2))
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms / 2, 5))
+    cpu_frac = powerup.cpu.frac_by_ms(sample, Math.max(watch.powerup_quantity_ms / 5, 5))
   } else {
-    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms / 50, 1))
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms / 100, 5))
     cpu_frac = powerup.cpu.frac_by_ms(sample, Math.max(watch.powerup_quantity_ms, 5))
   }
 
