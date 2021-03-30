@@ -2,7 +2,6 @@ const env = require('./.env')
 const { api, rpc } = require('./eosjs')(env.keys, 'https://eos.greymass.com')
 const ms = require('ms')
 const watchAccounts = require('./watchAccounts.json')
-const random = (min, max) => Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1)) + Math.ceil(min)
 
 async function init() {
   try {

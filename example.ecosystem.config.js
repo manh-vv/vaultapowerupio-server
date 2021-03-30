@@ -7,11 +7,11 @@ module.exports = {
       script: 'pwr-worker.js',
       args: null,
     },
-    {
-      name: 'watcher',
-      script: 'powerupWatcher.js',
-      args: null,
-    },
+    // {
+    //   name: 'watcher',
+    //   script: 'powerupWatcher.js',
+    //   args: null,
+    // },
     // {
     //   name: 'server',
     //   script: 'server.js',

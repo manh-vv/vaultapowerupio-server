@@ -1,17 +1,5 @@
-const { Resources } = require('@greymass/eosio-resources')
-const fetch = require('node-fetch')
 const env = require('./.env.js')
-const resources = new Resources({ fetch, url: 'https://eos.greymass.com' })
-const { api, rpc } = require('./eosjs')(env.keys, env.endpoint)
-const sleep = ms => new Promise(res => setTimeout(res, ms))
-
-
-const tapos = {
-  blocksBehind: 16,
-  expireSeconds: 30,
-  broadcast: true
-}
-const fracPwr = 1e8
+const { tapos, api,resources } = require('./eosjs')()
 
 async function getAccountBw(account) {
   const resources = (await api.rpc.get_account(account))
