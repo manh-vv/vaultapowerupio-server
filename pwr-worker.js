@@ -30,11 +30,12 @@ async function autoPowerup(owner, watch, net) {
   let cpu_frac = 0
 
   if (net) {
+    console.log('Performing NET Powerup');
     net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms / 5, 1))
     cpu_frac = powerup.cpu.frac_by_ms(sample, Math.max(watch.powerup_quantity_ms / 2, 2))
   } else {
     net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms / 50, 1))
-    cpu_frac = powerup.cpu.frac_by_ms(sample, Math.max(watch.powerup_quantity_ms, 2))
+    cpu_frac = powerup.cpu.frac_by_ms(sample, Math.max(watch.powerup_quantity_ms, 5))
   }
 
   const max_payment = "2.2000 EOS"
@@ -93,14 +94,12 @@ async function init() {
     const owners = await tryExec(async () => { return shuffle((await api.rpc.get_table_by_scope({ code: "eospowerupio", table: "account", limit: -1 })).rows.filter(el => el.count > 0).map(el => el.scope)) })
     for (owner of owners) {
       let { api, resources } = eosjs()
-      powerup = await resources.v1.powerup.get_state()
+      powerup = await tryExec(async()=>await resources.v1.powerup.get_state())
+      // powerup = await 
       console.log(owner)
       let watchAccounts = []
-      try {
-        watchAccounts = shuffle((await api.rpc.get_table_rows({ code: 'eospowerupio', scope: owner, table: "watchlist", limit: -1 })).rows.filter(el => el.active == 1))
-      } catch (error) {
-        console.error(error)
-      }
+      watchAccounts = await tryExec(async()=> shuffle((await api.rpc.get_table_rows({ code: 'eospowerupio', scope: owner, table: "watchlist", limit: -1 })).rows.filter(el => el.active == 1)))
+
       for (watch of watchAccounts) {
         // await autoPowerup(owner,watch)
         // await autoPowerup(owner,watch,true)

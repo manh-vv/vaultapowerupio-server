@@ -101,6 +101,7 @@ async function init(owner) {
         // await autoPowerup(owner,watch)
         // await autoPowerup(owner,watch,true)
         // continue
+        console.log(watch)
         console.log('Checking:', watch.account);
         if (watch.min_cpu_ms > 0) {
           const { msAvailable, netAvailable } = await tryExec(() => getAccountBw(watch.account))

@@ -20,7 +20,7 @@ async function doAction(name, data, account, actor, permission, retry) {
     if (!actor) actor = 'eospowerupio'
     if (!permission) permission = 'workers'
     console.log("Do Action:", name, data)
-    const authorization = [{ actor: env.workerAccount, permission: env.workerPermission },{actor:'eospowerupio',permission:'powerup'}]
+    const authorization = [{ actor: env.workerAccount, permission: env.workerPermission },{actor:'eospowerupio',permission:'workers'}]
     const { api } = init()
 
     const signed = await api.transact({
