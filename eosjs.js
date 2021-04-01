@@ -32,9 +32,8 @@ async function doAction(name, data, account, actor, permission, retry) {
       broadcast: false
     }).catch(err => {
       console.error('doAction transact error', err.toString())
-      retry++
-      if (retry < 5) return doAction(name, data, account, actor, permission, retry)
     })
+    if (!signed) return
     let results = []
     for (endpoint of new Set(env.endpoints)) {
       api.pushSignedTransaction(signed)
@@ -43,7 +42,7 @@ async function doAction(name, data, account, actor, permission, retry) {
         console.log('Pushed Transaction:',txid);
         results.push({ endpoint, txid: txid })
       }).catch(err => {
-        console.log(err.toString());
+        console.error(err.toString());
         results.push({ endpoint, error: err.toString() })
        })
     }
