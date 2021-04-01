@@ -8,8 +8,8 @@ const { Resources } = require('@greymass/eosio-resources')
 const contractAccount = env.contractAccount
 let api
 const tapos = {
-  blocksBehind: 12,
-  expireSeconds: 30,
+  blocksBehind: 6,
+  expireSeconds: 15,
   broadcast: true
 }
 async function doAction(name, data, account, actor, permission, retry) {
@@ -27,8 +27,8 @@ async function doAction(name, data, account, actor, permission, retry) {
       // "delay_sec": 0,
       actions: [{ account, name, data, authorization }]
     }, {
-      blocksBehind: 12,
-      expireSeconds: 30,
+      blocksBehind: 6,
+      expireSeconds: 15,
       broadcast: false
     }).catch(err => {
       console.error('doAction transact error', err.toString())
@@ -47,7 +47,7 @@ async function doAction(name, data, account, actor, permission, retry) {
         results.push({ endpoint, error: err.toString() })
        })
     }
-    console.log(results);
+    console.log('DoAction Results:',results);
 
     // const txid = result.transaction_id
     // console.log(`https://bloks.io/transaction/` + txid)
@@ -67,7 +67,7 @@ function init(keys, apiurl) {
   if (!keys) keys = env.keys
   const signatureProvider = new JsSignatureProvider(keys)
   if (!apiurl) apiurl = pickEndpoint(env.endpoints)
-  console.log('API:', apiurl)
+  // console.log('API:', apiurl)
   const resources = new Resources({ fetch, url: apiurl })
   var rpc = new JsonRpc(apiurl, { fetch })
   api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
