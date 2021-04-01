@@ -20,7 +20,7 @@ async function doAction(name, data, account, actor, permission, retry) {
     if (!actor) actor = 'eospowerupio'
     if (!permission) permission = 'workers'
     console.log("Do Action:", name, data)
-    const authorization = [{ actor: env.workerAccount, permission: env.workerPermission },{actor:'eospowerupio',permission:'workers'}]
+    const authorization = [{ actor: env.workerAccount, permission: env.workerPermission }, { actor: 'eospowerupio', permission: 'workers' }]
     const { api } = init()
 
     const signed = await api.transact({
@@ -35,19 +35,25 @@ async function doAction(name, data, account, actor, permission, retry) {
     })
     if (!signed) return
     let results = []
-    for (endpoint of new Set(env.endpoints)) {
-      api.pushSignedTransaction(signed)
-      .then(el => {
-        var txid = el.transaction_id
-        console.log('Pushed Transaction:',txid);
-        results.push({ endpoint, txid: txid })
-      }).catch(err => {
-        console.error(err.toString());
-        results.push({ endpoint, error: err.toString() })
-       })
-    }
-    console.log('DoAction Results:',results);
-
+    const endpoints = [...new Set(env.endpoints)]
+    endpoints.forEach((endpoint,i,arr) => {
+      {
+        console.log('Pushing TX:', endpoint);
+        const { api } = init(null,endpoint)
+        api.pushSignedTransaction(signed)
+          .then(el => {
+            var txid = el.transaction_id
+            console.log('Pushed Transaction:', txid);
+            results.push({ endpoint, txid: txid })
+          }).catch(err => {
+            console.error('pushedSignedError:', endpoint, err.toString());
+            results.push({ endpoint, error: err.toString() })
+          }).finally(data => {
+            // console.log();
+            if(i == arr.length - 1) console.log('DoAction Finished Results:', results);
+          })
+      }
+    })
     // const txid = result.transaction_id
     // console.log(`https://bloks.io/transaction/` + txid)
     // console.log(txid)

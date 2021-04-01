@@ -69,14 +69,15 @@ async function getAccountKb(account) {
 
 
 async function tryExec(exec, retry) {
+  if (!retry) retry = 0
   try {
-    if (!retry) retry = 0
     const result = await exec()
     return result
   } catch (error) {
     console.error(error)
     console.log("RETRYING", retry);
-    if (retry < 5) return tryExec(exec, retry++)
+    retry ++
+    if (retry < 5) return tryExec(exec, retry)
     else return
   }
 }
@@ -93,8 +94,8 @@ async function init() {
     for (owner of owners) {
       let { api, resources } = eosjs()
       powerup = await tryExec(async()=>await resources.v1.powerup.get_state())
-      // powerup = await 
-      console.log(owner)
+
+      console.log("Owner:",owner)
       let watchAccounts = []
       watchAccounts = await tryExec(async()=> shuffle((await api.rpc.get_table_rows({ code: 'eospowerupio', scope: owner, table: "watchlist", limit: -1 })).rows.filter(el => el.active == 1)))
 
