@@ -2,14 +2,15 @@ const env = require('./.env.js')
 const eosjs = require('./eosjs')
 
 async function tryExec(exec, retry) {
+  if (!retry) retry = 0
   try {
-    if (!retry) retry = 0
     const result = await exec()
     return result
   } catch (error) {
     console.error(error)
     console.log("RETRYING", retry);
-    if (retry < 5) return tryExec(exec, retry++)
+    retry++
+    if (retry < 4) return tryExec(exec, retry)
     else return
   }
 }
