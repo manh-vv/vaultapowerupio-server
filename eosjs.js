@@ -45,7 +45,7 @@ async function doAction(name, data, account, actor, permission, retry) {
     endpoints.forEach((endpoint,i,arr) => {
       {
         console.log('Pushing TX:', endpoint);
-        const { api } = init(null,endpoint)
+        const { api } = init(null,endpoint,true)
         api.pushSignedTransaction(signed)
           .then(el => {
             var txid = el.transaction_id
@@ -74,13 +74,22 @@ function pickEndpoint(endpoints) {
   return endpoints[random(0, endpoints.length - 1)]
 }
 
-function init(keys, apiurl) {
+function init(keys, apiurl,noQuickTimeout) {
   if (!keys) keys = env.keys
   const signatureProvider = new JsSignatureProvider(keys)
   if (!apiurl) apiurl = pickEndpoint(env.endpoints)
   console.log('API:', apiurl)
-  const resources = new Resources({ fetch:customFetch, url: apiurl })
-  var rpc = new JsonRpc(apiurl, {  fetch:customFetch })
+  var resources
+  var rpc
+
+  if(!noQuickTimeout) {
+     resources = new Resources({ fetch:customFetch, url: apiurl })
+     rpc = new JsonRpc(apiurl, {  fetch:customFetch })
+  } else {
+     resources = new Resources({ fetch, url: apiurl })
+     rpc = new JsonRpc(apiurl, {  fetch })
+  }
+
   api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
   return { api, rpc, tapos, resources, doAction }
 }
