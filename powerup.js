@@ -17,15 +17,21 @@ async function tryExec(exec, retry) {
 
 const methods = {
   /**
-   * 
+   *
    * @param {string} payer account paying for the powerup(auth required)
-   * @param {number} quantity amount of CPU time to reserve   
+   * @param {number} quantity amount of CPU time to reserve
    * @param {string} [receiver] account to receive CPU
    * @param {string=} [payerPermission = 'active'] custom permission to use for the powerup action
    * @param {number=} [maxPayment = 1] max EOS to spend for this powerup
    */
-  async powerup(payer, quantity, receiver, payerPermission,maxPayment) {
-    let { tapos, api,resources } = eosjs()
+  async powerup( payer, quantity, receiver, payerPermission, maxPayment ) {
+    let { resources } = eosjs()
+
+    const tapos = {
+      blocksBehind: 3,
+      expireSeconds: 35,
+      broadcast: true
+    }
 
     try {
       if (!payer) throw ("Missing Account Name")
@@ -37,10 +43,10 @@ const methods = {
       // await getAccountBw(receiver)
       quantityCpu = parseFloat(quantity) * 0.999
       quantityNet = parseFloat(quantity) * 0.001
-      
+
       const powerup = await resources.v1.powerup.get_state()
-      const sample = await resources.getSampledUsage()    
-      
+      const sample = await resources.getSampledUsage()
+
       let cpu_frac = powerup.cpu.frac_by_ms(sample, quantityCpu)
       console.log('cpu_frac:',cpu_frac);
       let net_frac = powerup.net.frac_by_kb(sample, Math.max(quantityCpu/50,0.5))
@@ -48,6 +54,7 @@ const methods = {
       // return
       cpu_frac = parseInt(cpu_frac * 1)
       net_frac = parseInt(net_frac * 1)
+
       const pwrAction = {
         account: 'eosio',
         name: 'powerup',
@@ -58,9 +65,9 @@ const methods = {
           payer, receiver
         }
       }
-      
-      const result = await tryExec(async ()=> await eosjs().api.transact({ actions: [pwrAction]},tapos))
-      
+
+      const result = await tryExec(async ()=> await eosjs(null,"https://eos.greymass.com").api.transact({ actions: [pwrAction]},tapos))
+
       // const result = await doAction('powerup',pwrAction.data, 'eosio', payerPermission,0)
       console.log(`https://bloks.io/transaction/${result.transaction_id}`)
 

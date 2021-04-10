@@ -4,11 +4,17 @@ const { TextDecoder, TextEncoder } = require('util')
 const env = require('./.env')
 const random = (min, max) => Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1)) + Math.ceil(min)
 const fetch = require('node-fetch')
+const customFetch = (url, options, timeout = 1450) => {
+  return Promise.race([
+    fetch(url, options),
+    new Promise((resolve, reject) => setTimeout(() => reject(new Error("timeout")), timeout)),
+  ])
+}
 const { Resources } = require('@greymass/eosio-resources')
 const contractAccount = env.contractAccount
 let api
 const tapos = {
-  blocksBehind: 6,
+  blocksBehind: 3,
   expireSeconds: 15,
   broadcast: true
 }
@@ -72,9 +78,9 @@ function init(keys, apiurl) {
   if (!keys) keys = env.keys
   const signatureProvider = new JsSignatureProvider(keys)
   if (!apiurl) apiurl = pickEndpoint(env.endpoints)
-  // console.log('API:', apiurl)
-  const resources = new Resources({ fetch, url: apiurl })
-  var rpc = new JsonRpc(apiurl, { fetch })
+  console.log('API:', apiurl)
+  const resources = new Resources({ fetch:customFetch, url: apiurl })
+  var rpc = new JsonRpc(apiurl, {  fetch:customFetch })
   api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
   return { api, rpc, tapos, resources, doAction }
 }
