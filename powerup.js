@@ -66,7 +66,7 @@ const methods = {
         }
       }
 
-      const result = await tryExec(async ()=> await eosjs(null,"https://eos.greymass.com").api.transact({ actions: [pwrAction]},tapos))
+      const result = await tryExec(async ()=> await eosjs(null,"https://eos.greymass.com",true).api.transact({ actions: [pwrAction]},tapos))
 
       // const result = await doAction('powerup',pwrAction.data, 'eosio', payerPermission,0)
       console.log(`https://bloks.io/transaction/${result.transaction_id}`)

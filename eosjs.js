@@ -4,10 +4,10 @@ const { TextDecoder, TextEncoder } = require('util')
 const env = require('./.env')
 const random = (min, max) => Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1)) + Math.ceil(min)
 const fetch = require('node-fetch')
-const customFetch = (url, options, timeout = 1450) => {
+const customFetch = (url, options, timeout = 5000) => {
   return Promise.race([
     fetch(url, options),
-    new Promise((resolve, reject) => setTimeout(() => reject(new Error("timeout")), timeout)),
+    new Promise((resolve, reject) => setTimeout(() => reject(new Error("customFetch Timeout!")), timeout)),
   ])
 }
 const { Resources } = require('@greymass/eosio-resources')
