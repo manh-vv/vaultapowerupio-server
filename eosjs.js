@@ -18,15 +18,18 @@ const tapos = {
   expireSeconds: 15,
   broadcast: true
 }
-async function doAction(name, data, account, actor, permission, retry) {
+async function doAction(name, data, account, actor, permission, retry,customAuth) {
+  if (!retry) retry = 0
+
   try {
-    if (!retry) retry = 0
     if (!data) data = {}
     if (!account) account = contractAccount
     if (!actor) actor = 'eospowerupio'
     if (!permission) permission = 'workers'
     console.log("Do Action:", name, data)
-    const authorization = [{ actor: env.workerAccount, permission: env.workerPermission }, { actor: 'eospowerupio', permission: 'workers' }]
+    let authorization
+    if (customAuth) authorization = customAuth
+    else authorization = [{ actor: env.workerAccount, permission: env.workerPermission }, { actor: 'eospowerupio', permission: 'workers' }]
     const { api } = init()
 
     const signed = await api.transact({

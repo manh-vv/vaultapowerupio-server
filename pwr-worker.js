@@ -31,7 +31,7 @@ async function autoPowerup(owner, watch, net) {
 
   if (net) {
     console.log('Performing NET Powerup');
-    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms / 2, 5))
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms, 10))
   } else {
     cpu_frac = powerup.cpu.frac_by_ms(sample, Math.max(watch.powerup_quantity_ms, 5))
   }
@@ -124,7 +124,7 @@ async function init() {
         console.time('checkWatch')
         await Promise.race([
           checkWatchAccount(owner,watch),
-          new Promise((res,reject) => setTimeout(() => reject(new Error("checkWatchAccount Timeout!")), 5000))
+          new Promise((res,reject) => setTimeout(() => reject(new Error("checkWatchAccount Timeout!")), ms('5s')))
         ]).catch(err => console.error(err.toString(),owner,watch))
         console.timeEnd('checkWatch')
       }
@@ -138,5 +138,14 @@ async function init() {
 }
 
 
+async function start(){
+  await Promise.race([
+    init(),
+    new Promise((res,reject) => setTimeout(() => reject(new Error("Init Timeout!")), ms('10m')))
+  ]).catch(err => {
+    console.error(err.toString())
+    process.exit()
+  })
+}
 
-init()
+start()
