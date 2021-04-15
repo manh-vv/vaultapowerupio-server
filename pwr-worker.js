@@ -134,7 +134,7 @@ async function init() {
     // ret
   }
   console.timeEnd('totalRun')
-
+  process.exit()
 }
 
 
