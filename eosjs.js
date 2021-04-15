@@ -55,7 +55,7 @@ async function doAction(name, data, account, actor, permission, retry,customAuth
             console.log('Pushed Transaction:', txid);
             results.push({ endpoint, txid: txid })
           }).catch(err => {
-            console.error('pushedSignedError:', endpoint, err.toString());
+            // console.error('pushedSignedError:', endpoint, err.toString());
             results.push({ endpoint, error: err.toString() })
           }).finally(data => {
             // console.log();
