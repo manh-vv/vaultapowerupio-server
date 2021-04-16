@@ -39,6 +39,7 @@ async function autoPowerup(owner, watch, net) {
   const max_payment = "2.2000 EOS"
   doAction('autopowerup', { payer: owner, watch_account: watch.account, net_frac: parseInt(net_frac), cpu_frac: parseInt(cpu_frac), max_payment })
 }
+
 async function autoBuyRam(payer, watch) {
   let { doAction } = eosjs()
   doAction('autobuyram', { payer, watch_account: watch.account })
@@ -96,12 +97,12 @@ async function checkWatchAccount(owner,watch) {
     if (netAvailable <= watch.min_cpu_ms / 3) tryExec(() => autoPowerup(owner, watch, true))
   }
   if (watch.min_kb_ram > 0 && watch.buy_ram_quantity_kb > 0) {
-    const kbAvailable = tryExec(() => getAccountKb(watch.account,resouces))
+    const kbAvailable = await tryExec(() => getAccountKb(watch.account,resouces))
     if (kbAvailable <= watch.min_kb_ram) tryExec(() => autoBuyRam(owner, watch))
   }
 }
 
-async function init() {
+async function init(owner) {
   try {
     console.time('totalRun')
     let { api, resources } = eosjs()
@@ -109,8 +110,9 @@ async function init() {
       sample = await resources.getSampledUsage()
       powerup = await resources.v1.powerup.get_state()
     })
-
-    const owners = await tryExec(async () => { return shuffle((await api.rpc.get_table_by_scope({ code: "eospowerupio", table: "account", limit: -1 })).rows.filter(el => el.count > 0).map(el => el.scope)) })
+    let owners
+    if(!owner) owners = await tryExec(async () => { return shuffle((await api.rpc.get_table_by_scope({ code: "eospowerupio", table: "account", limit: -1 })).rows.filter(el => el.count > 0).map(el => el.scope)) })
+    else owners = [owner]
     console.log('Owners:',owners.length);
     for (owner of owners) {
       let { api, resources } = eosjs()
@@ -138,9 +140,9 @@ async function init() {
 }
 
 
-async function start(){
+async function start(watcher){
   await Promise.race([
-    init(),
+    init(watcher),
     new Promise((res,reject) => setTimeout(() => reject(new Error("Init Timeout!")), ms('10m')))
   ]).catch(err => {
     console.error(err.toString())
@@ -148,4 +150,12 @@ async function start(){
   })
 }
 
-start()
+
+if (require.main === module) {
+  console.log("Starting: pwr-worker")
+  start(...process.argv.slice(2)).catch(console.error)
+    .then((result) => console.log('Finished'))
+}
+
+module.exports = start
+
