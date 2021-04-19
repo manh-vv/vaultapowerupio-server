@@ -16,11 +16,26 @@ const speedLimiter = slowDown({
 })
 const limiter = rateLimit({
   windowMs: ms('30m'),
-  max: 10 
+  max: 10
 });
 
-app.use(speedLimiter)
-app.use(limiter)
+
+const speedLimiter2 = slowDown({
+  windowMs: ms('10m'),
+  delayAfter: 100,
+  delayMs: 10
+})
+const limiter2 = rateLimit({
+  windowMs: ms('30m'),
+  max: 100
+});
+
+
+// app.use(speedLimiter)
+// app.use(limiter)
+
+
+
 app.use(bodyParser.json())
 
 app.use(cors())
@@ -30,7 +45,7 @@ app.use(function (req, res, next) {
   next()
 })
 
-app.use('/freePowerup/:accountName', async (req, res) => {
+app.use('/freePowerup/:accountName',speedLimiter,limiter,async (req, res) => {
   try {
     const name = String(req.params.accountName).trim().toLowerCase()
     const result = await serverActions.freePowerup(name, req.query)
@@ -43,11 +58,23 @@ app.use('/freePowerup/:accountName', async (req, res) => {
   }
 })
 
-app.post('/registerEmail/:email',async (req,res) => {
+app.post('/registerEmail/:email',speedLimiter,limiter,async (req,res) => {
   try {
     const result = await serverActions.registerEmail(req.params.email, req.query)
     if (result.error) res.statusCode = 500
     res.end()
+  } catch (error) {
+    res.statusCode = 500
+    console.log(error)
+    res.json(error)
+  }
+})
+
+app.use('/stats',speedLimiter2,limiter2,async(req,res)=> {
+  try {
+    const result = await serverActions.getStats()
+    if (result.error) res.statusCode = 500
+    res.json(result)
   } catch (error) {
     res.statusCode = 500
     console.log(error)

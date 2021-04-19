@@ -143,7 +143,7 @@ async function init(owner) {
 async function start(watcher){
   await Promise.race([
     init(watcher),
-    new Promise((res,reject) => setTimeout(() => reject(new Error("Init Timeout!")), ms('10m')))
+    new Promise((res,reject) => setTimeout(() => reject(new Error("Init Timeout!")), ms('15m')))
   ]).catch(err => {
     console.error(err.toString())
     process.exit()

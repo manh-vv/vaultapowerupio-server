@@ -2,6 +2,10 @@ const powerup = require('../powerup')
 const ax = require('axios')
 const ms = require('ms')
 const pwrAccount = 'eospowerupio'
+const {stats,updateStats} = require('../stats.js')
+
+updateStats()
+setInterval(updateStats,ms('10m'))
 
 let freePowerups = {}
 
@@ -47,5 +51,7 @@ module.exports = {
   async registerEmail(email){
     const result = await ax.post('http://eospowerup-bb-dev.azurewebsites.net/userrecord/add',{Email:email})
     return {result}
+  }, async getStats(){
+    return stats
   }
 }
