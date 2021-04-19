@@ -1,4 +1,4 @@
-const { api, rpc } = require('./eosjs.js')(null, 'https://boid-api-on-eos.animusystems.com')
+const { api, rpc } = require('./eosjs.js')(null, 'https://boid-api-on-eos.animusystems.com',true)
 
 var stats = {
   owners: 0,
@@ -18,7 +18,8 @@ async function updateStats() {
     for (owner of result) {
       getResults.push(new Promise((res) => {
         setTimeout(() => {
-          api.rpc.get_table_rows({ code: 'eospowerupio', scope: owner, table: "watchlist", limit: -1 }).then(el => {
+          api.rpc.get_table_rows({ code: 'eospowerupio', scope: owner, table: "watchlist", limit: -1 })
+          .then(el => {
             stats.totalWatched += el.rows.length
             res()
           })
@@ -33,7 +34,7 @@ async function updateStats() {
     //   // console.log('Total Watch Accounts:',stats.totalWatched)
     // })
   } catch (error) {
-    console.error(error);
+    console.error('Stats Error:',error);
   }
 }
 
