@@ -2,10 +2,16 @@ const powerup = require('../powerup')
 const ax = require('axios')
 const ms = require('ms')
 const pwrAccount = 'eospowerupio'
-const {stats,updateStats} = require('../stats.js')
+const {updateStats} = require('../stats.js')
+let stats = {}
 
-updateStats()
-setInterval(updateStats,ms('10m'))
+async function init(){
+  stats = await updateStats()
+  setInterval(async ()=>{
+    stats = await updateStats()
+  },ms('5m'))
+}
+init()
 
 let freePowerups = {}
 
