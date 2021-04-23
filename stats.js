@@ -32,32 +32,68 @@ async function tryExec(exec, retry) {
 
 async function updateStats() {
   try {
-    // stats.totalWatched = 0
-    // stats.owners = 0
     let totalWatched = 0
+    let totalDeposited = 0
     let i = 0
-    const result = (await eosjs(null,'https://boid-api-on-eos.animusystems.com').api.rpc.get_table_by_scope({ code: "eospowerupio", table: "account", limit: -1 })).rows.filter(el => el.count > 0).map(el => el.scope)
-    stats.owners = result.length
+    let i2 = 0
+    const owners = (await eosjs(null, 'https://boid-api-on-eos.animusystems.com').api.rpc.get_table_by_scope({ code: "eospowerupio", table: "account", limit: -1 })).rows.filter(el => el.count > 0).map(el => el.scope)
+    stats.owners = owners.length
     console.log('Owners', stats.owners)
     getResults = []
-    for (owner of result) {
-      getResults.push(new Promise((res,rej) => {
+
+    owners.forEach(async owner => {
+      getResults.push(new Promise((res, rej) => {
         setTimeout(() => {
           tryExec(() => {
-            eosjs(null,'https://boid-api-on-eos.animusystems.com',true).api.rpc.get_table_rows({ code: 'eospowerupio', scope: owner, table: "watchlist", limit: -1 })
-            .then(el => {
-              totalWatched += el.rows.length
-              res()
-            }).catch(rej)
+            eosjs(null, 'https://boid-api-on-eos.animusystems.com', true).api.rpc.get_table_rows({ code: 'eospowerupio', scope: owner, table: "watchlist", limit: -1 })
+              .then(el => {
+                totalWatched += el.rows.length
+                res()
+              })
           })
         }, i * 1000)
         i++
       }))
-    }
+      getResults.push(new Promise((res, rej) => {
+        setTimeout(() => {
+          tryExec(() => {
+            eosjs(null, 'https://boid-api-on-eos.animusystems.com', true).api.rpc.get_table_rows({ code: 'eospowerupio', scope: owner, table: "account", limit: -1 })
+              .then(el => {
+                totalDeposited += parseFloat(el.rows[0].balance)
+                res()
+              })
+          }).finally(res)
+        }, i2 * 1111)
+        i2++
+      }))
+    })
+
     await Promise.all(getResults)
-    stats.totalWatched = totalWatched
+    const rpc = eosjs(null, 'https://boid-api-on-eos.animusystems.com').api.rpc
+    const eosBal = parseFloat((await rpc.get_currency_balance('eosio.token', 'eospowerupio', "EOS"))[0])
+    const sxBal = parseFloat((await rpc.get_currency_balance('token.sx', 'eospowerupio', "SXEOS"))[0])
+    const sxStats = (await rpc.get_table_rows({ code: 'vaults.sx', table: 'vault', limit: -1, scope: 'vaults.sx' })).rows
+    const sxEOSDeposited = parseFloat(sxStats[0].deposit.quantity)
+    const sxEOSSupply = parseFloat(sxStats[0].supply.quantity)
+    const sxEOSValue = sxEOSDeposited / sxEOSSupply * sxBal
+    const internalEOSBal = parseFloat((await rpc.get_table_rows({ code: 'eospowerupio', table: 'account', limit: -1, scope: 'eospowerupio' })).rows[0].balance)
+    const solvency = sxEOSValue + eosBal - totalDeposited
+
+    const extraStats = {
+      totalWatched,
+      eosBal,
+      sxBal,
+      sxEOSValue,
+      internalEOSBal,
+      totalDeposited,
+      solvency
+    }
+    Object.assign(stats, extraStats)
     console.log(stats);
-    mixpanel.track('stats',stats)
+    if (require.main != module) {
+      console.log('Send Data to mixpanel...');
+      mixpanel.track('stats', stats)
+    }
     return stats
 
   } catch (error) {

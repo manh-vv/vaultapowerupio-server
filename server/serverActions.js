@@ -44,7 +44,7 @@ module.exports = {
       const data = {
         payer:"eospowerupio",
         receiver:accountName,
-        net_frac:netPowerupKb(0.5),
+        net_frac:netPowerupKb(1),
         cpu_frac:cpuPowerupMs(3),
         max_payment:"0.0080 EOS"
       }

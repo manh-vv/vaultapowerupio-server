@@ -86,6 +86,6 @@ if(process.argv[2] && require.main === module) {
     console.log("Starting:", process.argv[2])
 methods.powerup(...process.argv.slice(2)).catch(console.error)
   .then((result) => console.log('Finished'))
-} else console.error("must Specify account and quantity for powerup")
+}
 
 module.exports = methods.powerup

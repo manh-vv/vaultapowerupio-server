@@ -81,7 +81,7 @@ function init(keys, apiurl,noQuickTimeout) {
   if (!keys) keys = env.keys
   const signatureProvider = new JsSignatureProvider(keys)
   if (!apiurl) apiurl = pickEndpoint(env.endpoints)
-  console.log('API:', apiurl)
+  // console.log('API:', apiurl)
   var resources
   var rpc
 
