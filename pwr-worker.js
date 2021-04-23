@@ -31,10 +31,10 @@ async function autoPowerup(owner, watch, net) {
 
   if (net) {
     console.log('Performing NET Powerup');
-    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms, 10))
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms*2, 50))
   } else {
     cpu_frac = powerup.cpu.frac_by_ms(sample, Math.max(watch.powerup_quantity_ms, 5))
-    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/5, 1))
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/2, 10))
   }
 
   const max_payment = "2.2000 EOS"
