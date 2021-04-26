@@ -4,7 +4,7 @@ const { TextDecoder, TextEncoder } = require('util')
 const env = require('./.env')
 const random = (min, max) => Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1)) + Math.ceil(min)
 const fetch = require('node-fetch')
-const customFetch = (url, options, timeout = 5000) => {
+const customFetch = (url, options, timeout = 8000) => {
   return Promise.race([
     fetch(url, options),
     new Promise((resolve, reject) => setTimeout(() => reject(new Error("customFetch Timeout!")), timeout)),
@@ -81,7 +81,7 @@ function init(keys, apiurl,noQuickTimeout) {
   if (!keys) keys = env.keys
   const signatureProvider = new JsSignatureProvider(keys)
   if (!apiurl) apiurl = pickEndpoint(env.endpoints)
-  // console.log('API:', apiurl)
+  console.log('API:', apiurl)
   var resources
   var rpc
 

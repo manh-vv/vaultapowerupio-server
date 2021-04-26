@@ -63,7 +63,7 @@ async function updateStats() {
                 res()
               })
           }).finally(res)
-        }, i2 * 1111)
+        }, i2 * 1100)
         i2++
       }))
     })
@@ -92,7 +92,7 @@ async function updateStats() {
     console.log(stats);
     if (require.main != module) {
       console.log('Send Data to mixpanel...');
-      mixpanel.track('stats', stats)
+      mixpanel.track('stats', Object.assign({},stats))
     }
     return stats
 

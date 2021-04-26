@@ -31,10 +31,10 @@ async function autoPowerup(owner, watch, net) {
 
   if (net) {
     console.log('Performing NET Powerup');
-    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms*2, 50))
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms*2, 200))
   } else {
     cpu_frac = powerup.cpu.frac_by_ms(sample, Math.max(watch.powerup_quantity_ms, 5))
-    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/2, 10))
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/3, 5))
   }
 
   const max_payment = "2.2000 EOS"
@@ -71,7 +71,7 @@ async function getAccountKb(account,resources) {
 }
 
 async function tryExec(exec, retry) {
-  const timeout = 5000
+  const timeout = 8000
   if (!retry) retry = 0
   try {
     const result = await Promise.race([
