@@ -8,6 +8,7 @@ const slowDown = require('express-slow-down')
 var cors = require('cors')
 const serverActions = require('./serverActions')
 app.set('trust proxy', 1);
+const ax = require('axios')
 
 const speedLimiter = slowDown({
   windowMs: ms('60m'),
@@ -40,13 +41,34 @@ app.use(bodyParser.json())
 
 app.use(cors())
 
-app.use(function (req, res, next) {
+let ips = []
+
+app.use(async function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
+  var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  console.log('IP:', ip)
+  let result
+  if (!ips.find(el => el == ip)) {
+    console.log('New IP');
+    try {
+      result = await ax.get(`https://api.ipdata.co/${ip}?api-key=f236e582041bb30f259f92a9e0a7c4052a53a03e7b8a6bb9ff384930`)
+      console.log(result?.data)
+    } catch (error) {
+      console.log(error.toString())
+    }
+    if (result?.data?.threat?.is_tor) {
+      console.log('Block Tor Request:', result);
+      console.log('TOR REQUEST:', req.params, req.body);
+      res.statusCode(500)
+      res.json({ error: "try again later" })
+    } else ips.push(ip)
+  } else console.log('IP was seen:', ip)
   next()
 })
 
-app.use('/freePowerup/:accountName',speedLimiter,limiter,async (req, res) => {
+app.use('/freePowerup/:accountName', speedLimiter, limiter, async (req, res) => {
   try {
+    console.log('Powerup Request:', req?.params?.accountName, req.headers['x-forwarded-for'] || req.connection.remoteAddress);
     const name = String(req.params.accountName).trim().toLowerCase()
     const result = await serverActions.freePowerup(name, req.query)
     if (result.error) res.statusCode = 500
@@ -58,7 +80,7 @@ app.use('/freePowerup/:accountName',speedLimiter,limiter,async (req, res) => {
   }
 })
 
-app.post('/registerEmail/:email',speedLimiter,limiter,async (req,res) => {
+app.post('/registerEmail/:email', speedLimiter, limiter, async (req, res) => {
   try {
     const result = await serverActions.registerEmail(req.params.email, req.query)
     if (result.error) res.statusCode = 500
@@ -70,7 +92,7 @@ app.post('/registerEmail/:email',speedLimiter,limiter,async (req,res) => {
   }
 })
 
-app.use('/stats',speedLimiter2,limiter2,async(req,res)=> {
+app.use('/stats', speedLimiter2, limiter2, async (req, res) => {
   try {
     const result = await serverActions.getStats()
     if (result.error) res.statusCode = 500

@@ -31,10 +31,10 @@ async function autoPowerup(owner, watch, net) {
 
   if (net) {
     console.log('Performing NET Powerup');
-    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms*2, 200))
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms * 4, 200))
   } else {
     cpu_frac = powerup.cpu.frac_by_ms(sample, Math.max(watch.powerup_quantity_ms, 5))
-    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms/3, 5))
+    net_frac = powerup.net.frac_by_kb(sample, Math.max(watch.powerup_quantity_ms / 2, 10))
   }
 
   const max_payment = "2.2000 EOS"
@@ -54,11 +54,11 @@ async function getAccountBw(account) {
   console.log("Remaining CPU Ms:", msAvailable);
   const netAvailable = resources.net_limit.available / 1000
   console.log("Remaining Net kb:", netAvailable);
-  return { msAvailable, netAvailable,resources }
+  return { msAvailable, netAvailable, resources }
 }
 
-async function getAccountKb(account,resources) {
-  if(!resources) {
+async function getAccountKb(account, resources) {
+  if (!resources) {
     let { api } = eosjs()
     resources = (await api.rpc.get_account(account))
   }
@@ -76,29 +76,29 @@ async function tryExec(exec, retry) {
   try {
     const result = await Promise.race([
       exec(),
-      new Promise((res,reject) => setTimeout(() => reject(new Error("tryExec Timeout!")), timeout))
+      new Promise((res, reject) => setTimeout(() => reject(new Error("tryExec Timeout!")), timeout))
     ])
     return result
   } catch (error) {
     console.error(error)
     console.log("RETRYING", retry);
-    retry ++
+    retry++
     if (retry < 5) return tryExec(exec, retry)
     else return
   }
 }
 
-async function checkWatchAccount(owner,watch) {
+async function checkWatchAccount(owner, watch) {
   // console.log('\n');
   console.log('Checking:', watch.account);
-  const { msAvailable, netAvailable,resouces } = await tryExec(() => getAccountBw(watch.account))
+  const { msAvailable, netAvailable, resouces } = await tryExec(() => getAccountBw(watch.account))
 
   if (watch.min_cpu_ms > 0) {
     if (msAvailable <= watch.min_cpu_ms) tryExec(() => autoPowerup(owner, watch))
     if (netAvailable <= watch.min_cpu_ms / 3) tryExec(() => autoPowerup(owner, watch, true))
   }
   if (watch.min_kb_ram > 0 && watch.buy_ram_quantity_kb > 0) {
-    const kbAvailable = await tryExec(() => getAccountKb(watch.account,resouces))
+    const kbAvailable = await tryExec(() => getAccountKb(watch.account, resouces))
     if (kbAvailable <= watch.min_kb_ram) tryExec(() => autoBuyRam(owner, watch))
   }
 }
@@ -112,28 +112,28 @@ async function init(owner) {
       powerup = await resources.v1.powerup.get_state()
     })
     let owners
-    if(!owner) owners = await tryExec(async () => { return shuffle((await api.rpc.get_table_by_scope({ code: "eospowerupio", table: "account", limit: -1 })).rows.filter(el => el.count > 0).map(el => el.scope)) })
+    if (!owner) owners = await tryExec(async () => { return shuffle((await api.rpc.get_table_by_scope({ code: "eospowerupio", table: "account", limit: -1 })).rows.filter(el => el.count > 0).map(el => el.scope)) })
     else owners = [owner]
-    console.log('Owners:',owners.length);
+    console.log('Owners:', owners.length);
     for (owner of owners) {
       let { api, resources } = eosjs()
-      powerup = await tryExec(async()=>await resources.v1.powerup.get_state())
+      powerup = await tryExec(async () => await resources.v1.powerup.get_state())
       // console.log('\n');
-      console.log("Owner:",owner)
+      console.log("Owner:", owner)
       let watchAccounts = []
-      watchAccounts = await tryExec(async()=> shuffle((await api.rpc.get_table_rows({ code: 'eospowerupio', scope: owner, table: "watchlist", limit: -1 })).rows.filter(el => el.active == 1)))
+      watchAccounts = await tryExec(async () => shuffle((await api.rpc.get_table_rows({ code: 'eospowerupio', scope: owner, table: "watchlist", limit: -1 })).rows.filter(el => el.active == 1)))
 
       for (watch of watchAccounts) {
         console.time('checkWatch')
         await Promise.race([
-          checkWatchAccount(owner,watch),
-          new Promise((res,reject) => setTimeout(() => reject(new Error("checkWatchAccount Timeout!")), ms('5s')))
-        ]).catch(err => console.error(err.toString(),owner,watch))
+          checkWatchAccount(owner, watch),
+          new Promise((res, reject) => setTimeout(() => reject(new Error("checkWatchAccount Timeout!")), ms('5s')))
+        ]).catch(err => console.error(err.toString(), owner, watch))
         console.timeEnd('checkWatch')
       }
     }
   } catch (error) {
-    console.error('pwr-worker error:',error)
+    console.error('pwr-worker error:', error)
     // ret
   }
   console.timeEnd('totalRun')
@@ -141,10 +141,10 @@ async function init(owner) {
 }
 
 
-async function start(watcher){
+async function start(watcher) {
   await Promise.race([
     init(watcher),
-    new Promise((res,reject) => setTimeout(() => reject(new Error("Init Timeout!")), ms('15m')))
+    new Promise((res, reject) => setTimeout(() => reject(new Error("Init Timeout!")), ms('25m')))
   ]).catch(err => {
     console.error(err.toString())
     process.exit()

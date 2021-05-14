@@ -4,3 +4,4 @@ watchAccounts.json
 sync*
 allSync.sh
 ecosystem.config.js
+emails.json

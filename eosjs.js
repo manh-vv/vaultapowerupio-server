@@ -18,7 +18,7 @@ const tapos = {
   expireSeconds: 15,
   broadcast: true
 }
-async function doAction(name, data, account, actor, permission, retry,customAuth) {
+async function doAction(name, data, account, actor, permission, retry, customAuth) {
   if (!retry) retry = 0
 
   try {
@@ -45,10 +45,10 @@ async function doAction(name, data, account, actor, permission, retry,customAuth
     if (!signed) return
     let results = []
     const endpoints = [...new Set(env.endpoints)]
-    endpoints.forEach((endpoint,i,arr) => {
+    endpoints.forEach((endpoint, i, arr) => {
       {
         console.log('Pushing TX:', endpoint);
-        const { api } = init(null,endpoint,true)
+        const { api } = init(null, endpoint, true)
         api.pushSignedTransaction(signed)
           .then(el => {
             var txid = el.transaction_id
@@ -59,7 +59,7 @@ async function doAction(name, data, account, actor, permission, retry,customAuth
             results.push({ endpoint, error: err.toString() })
           }).finally(data => {
             // console.log();
-            if(i == arr.length - 1) console.log('DoAction Finished Results:', results);
+            if (i == arr.length - 1) console.log('DoAction Finished Results:', results);
           })
       }
     })
@@ -77,20 +77,20 @@ function pickEndpoint(endpoints) {
   return endpoints[random(0, endpoints.length - 1)]
 }
 
-function init(keys, apiurl,noQuickTimeout) {
+function init(keys, apiurl, noQuickTimeout) {
   if (!keys) keys = env.keys
   const signatureProvider = new JsSignatureProvider(keys)
   if (!apiurl) apiurl = pickEndpoint(env.endpoints)
-  console.log('API:', apiurl)
+  // console.log('API:', apiurl)
   var resources
   var rpc
 
-  if(!noQuickTimeout) {
-     resources = new Resources({ fetch:customFetch, url: apiurl })
-     rpc = new JsonRpc(apiurl, {  fetch:customFetch })
+  if (!noQuickTimeout) {
+    resources = new Resources({ fetch: customFetch, url: apiurl })
+    rpc = new JsonRpc(apiurl, { fetch: customFetch })
   } else {
-     resources = new Resources({ fetch, url: apiurl })
-     rpc = new JsonRpc(apiurl, {  fetch })
+    resources = new Resources({ fetch, url: apiurl })
+    rpc = new JsonRpc(apiurl, { fetch })
   }
 
   api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })

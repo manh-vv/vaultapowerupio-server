@@ -2,14 +2,14 @@ const powerup = require('../powerup')
 const ax = require('axios')
 const ms = require('ms')
 const pwrAccount = 'eospowerupio'
-const {updateStats} = require('../stats.js')
+const { updateStats } = require('../stats.js')
 let stats = {}
 
-async function init(){
+async function init() {
   stats = await updateStats()
-  setInterval(async ()=>{
+  setInterval(async () => {
     stats = await updateStats()
-  },ms('5m'))
+  }, ms('5m'))
 }
 init()
 
@@ -38,26 +38,26 @@ function netPowerupKb(kb) {
 }
 
 module.exports = {
-  async freePowerup(accountName){
+  async freePowerup(accountName) {
     if (checkValid(accountName)) {
-      const {doAction} = require('../eosjs.js')()
+      const { doAction } = require('../eosjs.js')()
       const data = {
-        payer:"eospowerupio",
-        receiver:accountName,
-        net_frac:netPowerupKb(1),
-        cpu_frac:cpuPowerupMs(3),
-        max_payment:"0.0080 EOS"
+        payer: "eospowerupio",
+        receiver: accountName,
+        net_frac: netPowerupKb(10),
+        cpu_frac: cpuPowerupMs(3),
+        max_payment: "0.0080 EOS"
       }
-      const result = doAction('dopowerup',data,'eospowerupio','eospowerupio','powerup',null,[{ actor: 'eospowerupio', permission: 'powerup' }])
+      const result = doAction('dopowerup', data, 'eospowerupio', 'eospowerupio', 'powerup', null, [{ actor: 'eospowerupio', permission: 'powerup' }])
 
-      return {result}
+      return { result }
     }
-    else return {error:"try again later"}
+    else return { error: "try again later" }
   },
-  async registerEmail(email){
-    const result = await ax.post('http://eospowerup-bb-dev.azurewebsites.net/userrecord/add',{Email:email})
-    return {result}
-  }, async getStats(){
+  async registerEmail(email) {
+    const result = await ax.post('http://eospowerup-bb-dev.azurewebsites.net/userrecord/add', { Email: email })
+    return { result }
+  }, async getStats() {
     return stats
   }
 }
