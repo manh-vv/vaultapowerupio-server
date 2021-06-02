@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStats = exports.freePowerup = exports.doPowerup = exports.resourcesCosts = void 0;
+exports.getStats = exports.freePowerup = exports.doAutoPowerup = exports.doPowerup = exports.resourcesCosts = void 0;
 const eosio_1 = require("@greymass/eosio");
 const eosio_2 = require("./eosio");
 const eospowerupio_types_1 = require("./types/eospowerupio.types");
@@ -23,10 +23,21 @@ async function doPowerup(payer, receiver, cpuQuantityMs, netQuantityMs) {
     const net_frac = kbToFrac * netQuantityMs;
     console.log('Max Payment:', max_payment.toString());
     const params = eospowerupio_types_1.Dopowerup.from({ cpu_frac, max_payment, payer, net_frac, receiver });
-    const results = await eosio_2.doAction('dopowerup', params, null, [eosio_1.PermissionLevel.from("eospowerupio@powerup")], [env_1.default.keys[1]]);
+    const results = await eosio_2.doAction('dopowerup', params);
     return results;
 }
 exports.doPowerup = doPowerup;
+async function doAutoPowerup(payer, watch_account, cpuQuantityMs, netQuantityMs) {
+    const { cpuMsCost, netKbCost, kbToFrac, msToFrac } = exports.resourcesCosts || await eosio_2.getResouceCosts();
+    const max_payment = eosio_1.Asset.from((((cpuMsCost * cpuQuantityMs) + (netKbCost * netQuantityMs)) * 1.05), eosio_1.Asset.Symbol.from("4,EOS"));
+    const cpu_frac = msToFrac * cpuQuantityMs;
+    const net_frac = kbToFrac * netQuantityMs;
+    console.log('Max Payment:', max_payment.toString());
+    const params = eospowerupio_types_1.Autopowerup.from({ cpu_frac, max_payment, payer, net_frac, watch_account });
+    const results = await eosio_2.doAction('autopowerup', params, null, [eosio_1.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission }), eosio_1.PermissionLevel.from({ actor: env_1.default.contractAccount, permission: "workers" })]);
+    return results;
+}
+exports.doAutoPowerup = doAutoPowerup;
 async function freePowerup(accountName, params) {
     if (typeof accountName == 'string')
         accountName = eosio_1.Name.from(accountName);

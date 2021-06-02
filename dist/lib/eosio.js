@@ -174,6 +174,7 @@ async function doAction(name, data, contract, authorization, keys, retry) {
         account: contract,
         name, data
     });
+    console.log("Pushing:", JSON.stringify(data, null, 2), JSON.stringify(action.toJSON(), null, 2));
     const transaction = eosio_1.Transaction.from({
         ...header,
         actions: [action], max_cpu_usage_ms: 8,

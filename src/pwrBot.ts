@@ -3,12 +3,12 @@ import env from './lib/env'
 import { getAccount, doAction, getFullTable, getResouceCosts, ResourceCosts, getAllScopes } from './lib/eosio'
 import ms from 'ms'
 import { shuffle } from './lib/utils'
-import { doPowerup, resourcesCosts } from './lib/serverActions'
-import { Name, NameType } from '@greymass/eosio'
+import { doAutoPowerup, resourcesCosts } from './lib/serverActions'
+import { Name, NameType, PermissionLevel } from '@greymass/eosio'
 import { Autobuyram, Autopowerup, WatchlistRow } from './lib/types/eospowerupio.types'
 
 async function autoBuyRam(payer: Name, watch: WatchlistRow) {
-  doAction('autobuyram', Autobuyram.from({ payer, watch_account: watch.account }))
+  doAction('autobuyram', Autobuyram.from({ payer, watch_account: watch.account }), null, [PermissionLevel.from({ actor: env.workerAccount, permission: env.workerPermission }), PermissionLevel.from({ actor: env.contractAccount, permission: "workers" })])
 }
 
 async function getAccountBw(account: Name) {
@@ -33,7 +33,7 @@ async function autoPowerup(owner: Name, watch: WatchlistRow, doNet: Boolean = fa
   let net = Math.max(watch.powerup_quantity_ms.toNumber() * 3, 150)
   // if (doNet) net *= 5
 
-  doPowerup(owner, watch.account, cpu, net).then(el => {
+  doAutoPowerup(owner, watch.account, cpu, net).then(el => {
     const receipt = el.receipts[0]
     if (receipt) {
       console.log(' ');

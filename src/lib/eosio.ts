@@ -187,7 +187,7 @@ export async function doAction(name: Name | string, data?: { [key: string]: any 
     account: contract,
     name, data
   })
-  // console.log("Pushing:", JSON.stringify(data, null, 2), JSON.stringify(action.toJSON(), null, 2));
+  console.log("Pushing:", JSON.stringify(data, null, 2), JSON.stringify(action.toJSON(), null, 2));
 
   const transaction = Transaction.from({
     ...header,

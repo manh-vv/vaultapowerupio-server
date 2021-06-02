@@ -12,7 +12,7 @@ const serverActions_1 = require("./lib/serverActions");
 const eosio_2 = require("@greymass/eosio");
 const eospowerupio_types_1 = require("./lib/types/eospowerupio.types");
 async function autoBuyRam(payer, watch) {
-    eosio_1.doAction('autobuyram', eospowerupio_types_1.Autobuyram.from({ payer, watch_account: watch.account }));
+    eosio_1.doAction('autobuyram', eospowerupio_types_1.Autobuyram.from({ payer, watch_account: watch.account }), null, [eosio_2.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission }), eosio_2.PermissionLevel.from({ actor: env_1.default.contractAccount, permission: "workers" })]);
 }
 async function getAccountBw(account) {
     const resources = await eosio_1.getAccount(account);
@@ -30,7 +30,7 @@ async function autoPowerup(owner, watch, doNet = false) {
     console.log(' ');
     let cpu = Math.max(watch.powerup_quantity_ms.toNumber(), 5);
     let net = Math.max(watch.powerup_quantity_ms.toNumber() * 3, 150);
-    serverActions_1.doPowerup(owner, watch.account, cpu, net).then(el => {
+    serverActions_1.doAutoPowerup(owner, watch.account, cpu, net).then(el => {
         const receipt = el.receipts[0];
         if (receipt) {
             console.log(' ');

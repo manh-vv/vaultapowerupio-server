@@ -1,6 +1,6 @@
 import { Asset, Name, NameType, PermissionLevel } from '@greymass/eosio'
 import { doAction, getResouceCosts, ResourceCosts } from './eosio'
-import { Dopowerup as DoPowerUp, Logpowerup } from './types/eospowerupio.types'
+import { Autopowerup, Dopowerup as DoPowerUp, Logpowerup } from './types/eospowerupio.types'
 import { Dopowerup } from '@prisma/client'
 import * as res from '@greymass/eosio-resources'
 import db from './db'
@@ -25,7 +25,18 @@ export async function doPowerup(payer: NameType, receiver: NameType, cpuQuantity
   const net_frac = kbToFrac * netQuantityMs
   console.log('Max Payment:', max_payment.toString());
   const params = DoPowerUp.from({ cpu_frac, max_payment, payer, net_frac, receiver })
-  const results = await doAction('dopowerup', params, null, [PermissionLevel.from("eospowerupio@powerup")], [env.keys[1]])
+  const results = await doAction('dopowerup', params)
+  return results
+}
+
+export async function doAutoPowerup(payer: NameType, watch_account: NameType, cpuQuantityMs: number, netQuantityMs: number,) {
+  const { cpuMsCost, netKbCost, kbToFrac, msToFrac } = resourcesCosts || await getResouceCosts()
+  const max_payment = Asset.from((((cpuMsCost * cpuQuantityMs) + (netKbCost * netQuantityMs)) * 1.05), Asset.Symbol.from("4,EOS"))
+  const cpu_frac = msToFrac * cpuQuantityMs
+  const net_frac = kbToFrac * netQuantityMs
+  console.log('Max Payment:', max_payment.toString());
+  const params: Autopowerup = Autopowerup.from({ cpu_frac, max_payment, payer, net_frac, watch_account })
+  const results = await doAction('autopowerup', params, null, [PermissionLevel.from({ actor: env.workerAccount, permission: env.workerPermission }), PermissionLevel.from({ actor: env.contractAccount, permission: "workers" })])
   return results
 }
 
