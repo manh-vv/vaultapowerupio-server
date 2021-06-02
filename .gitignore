@@ -1,7 +1,38 @@
+# compiled output
+# /dist
+/node_modules
 .env*
-node_modules
-watchAccounts.json
+# Logs
+logs
+*.log
 sync*
-allSync.sh
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.db
+*.db-journal
+powerup.db
+# OS
+.DS_Store
+pullDB.sh
 ecosystem.config.js
-emails.json
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

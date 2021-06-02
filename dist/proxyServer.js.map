@@ -1,0 +1,1 @@
+{"version":3,"file":"proxyServer.js","sourceRoot":"","sources":["../src/proxyServer.js"],"names":[],"mappings":";;;;;AAAA,sEAA4C;AAE5C,IAAI,KAAK,GAAG,IAAI,yBAAc,CAAC;IAC7B,eAAe,EAAE,eAAe;IAChC,OAAO,EAAE,KAAK;CACf,CAAC,CAAA;AAGF,KAAK,CAAC,QAAQ,CAAC,CAAC,mBAAmB,CAAC,EAAE,CAAC,uBAAuB,CAAC,CAAC,CAAA;AAGhE,KAAK,CAAC,KAAK,EAAE,CAAA"}
