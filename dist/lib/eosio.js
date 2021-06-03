@@ -205,6 +205,7 @@ async function doAction(name, data, contract, authorization, keys, retry) {
             }, timeoutTimer))
         ]);
     }));
+    console.log(receipts, errors);
     let uniqueErrors = [];
     errors.forEach(el => {
         const exists = uniqueErrors.findIndex(el2 => el2.error = el.error);
