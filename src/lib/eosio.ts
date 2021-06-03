@@ -223,7 +223,7 @@ export async function doAction(name: Name | string, data?: { [key: string]: any 
       }, timeoutTimer))
     ])
   }))
-  // console.log(receipts, errors);
+  console.log(receipts, errors);
   interface UniqueErrors {
     endpoints: string[]
     error: string
