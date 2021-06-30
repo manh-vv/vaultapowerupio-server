@@ -27,7 +27,7 @@ async function init() {
         for (const account of shuffle(result)) {
             const balance = (await eosio_1.getFullTable({ contract: env_1.default.contractAccount, tableName: eosio_2.Name.from('account'), scope: account }))[0].balance;
             console.log(balance);
-            if (parseFloat(balance) < 0.003) {
+            if (parseFloat(balance) < 0.035) {
                 console.log(account, balance);
                 const result = await eosio_1.doAction(eosio_2.Name.from('withdraw'), eospowerupio_types_1.Withdraw.from({ owner: account, quantity: balance, receiver: account }), null, [eosio_2.PermissionLevel.from("eospowerupio@powerup")], [env_1.default.keys[1]]);
                 console.log(result);

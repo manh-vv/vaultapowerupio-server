@@ -1,5 +1,11 @@
 import { Name } from '@greymass/eosio';
 import chalk from 'chalk'
+import db from './db'
+export const freeDailyQuota = 4
+import env from './env'
+import ms from 'ms'
+
+
 // import envImport from './env'
 import { safeDo, getAccount } from './eosio';
 export const sleep = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -50,4 +56,28 @@ export async function accountExists(name: string) {
   }
 
 
+}
+
+interface QuotaResult { nextPowerup?: number, quotaAvailable: number, error?: string }
+export async function checkQuota(userid: string): Promise<QuotaResult> {
+  try {
+    const recentPowerups = await db.dopowerup.findMany({
+      where: { User: { id: userid }, payer: env.contractAccount.toString(), time: { gte: Date.now() - ms('24hr') }, failed: { not: true } },
+      orderBy: { time: 'desc' },
+    })
+    if (recentPowerups.length >= freeDailyQuota) {
+      console.log('found recent tg User powerups');
+      const oldest = recentPowerups[recentPowerups.length - 1]
+      console.log(oldest);
+      const elapsed = Date.now() - oldest.time
+      console.log('elapsed', elapsed);
+      const timeLeft = ms('24h') - elapsed
+      const nextPowerup = Date.now() + timeLeft
+      console.log('msleft:', timeLeft);
+      return { nextPowerup, quotaAvailable: 0 }
+    } else return { quotaAvailable: freeDailyQuota - recentPowerups.length }
+  } catch (error) {
+    console.error('checkQuota Error:', error.toString())
+    return { error: "account error", quotaAvailable: 0 }
+  }
 }

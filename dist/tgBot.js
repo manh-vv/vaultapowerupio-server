@@ -13,12 +13,10 @@ const javascript_time_ago_1 = __importDefault(require("javascript-time-ago"));
 const en_1 = __importDefault(require("javascript-time-ago/locale/en"));
 javascript_time_ago_1.default.addDefaultLocale(en_1.default);
 const timeAgo = new javascript_time_ago_1.default("en-US");
-const freeDailyQuota = 7;
 if (token === undefined) {
     throw new Error('telegramKey Missing!');
 }
 const serverActions_1 = require("./lib/serverActions");
-const ms_1 = __importDefault(require("ms"));
 const bot = new telegraf_1.Telegraf(token);
 async function init(...inputs) {
     try {
@@ -28,12 +26,9 @@ async function init(...inputs) {
             await ctx.replyWithPhoto({ source: fs_extra_1.readFileSync('../images/powerupBanner.jpg') }, { caption: "Welcome to eospowerup.io Bot, powered by Boid and Eden on EOS." });
             await showMainMenu(ctx);
         }).catch(err => console.error(err.toString()));
-        bot.command('test', async (ctx) => {
-            registerUser(ctx);
-        }).catch(err => console.error(err.toString()));
         bot.hears('Free PowerUp', async (ctx) => {
-            await registerUser(ctx);
-            const tgQuota = await checktgQuota(ctx.message.from.id);
+            const userid = await registerUser(ctx);
+            const tgQuota = await utils_1.checkQuota(userid);
             if (tgQuota.error) {
                 await ctx.reply(tgQuota.error);
                 await showMainMenu(ctx);
@@ -48,7 +43,7 @@ async function init(...inputs) {
                 return showMainMenu(ctx);
             }
             else {
-                await ctx.reply(`You have ${tgQuota.quotaAvailable} of ${freeDailyQuota} free PowerUps available today.`);
+                await ctx.reply(`You have ${tgQuota.quotaAvailable} of ${utils_1.freeDailyQuota} free PowerUps available today.`);
             }
             await ctx.reply('Enter the name of the EOS account to PowerUp');
             bot.hears(RegExp('[\s\S]*'), async (ctx) => {
@@ -65,31 +60,6 @@ async function init(...inputs) {
     }
 }
 exports.default = init;
-async function checktgQuota(tgid) {
-    try {
-        const recentPowerups = await db_1.default.dopowerup.findMany({
-            where: { User: { telegramId: tgid }, payer: env_1.default.contractAccount.toString(), time: { gte: Date.now() - ms_1.default('24hr') }, failed: { not: true } },
-            orderBy: { time: 'desc' },
-        });
-        if (recentPowerups.length >= freeDailyQuota) {
-            console.log('found recent tg User powerups');
-            const oldest = recentPowerups[recentPowerups.length - 1];
-            console.log(oldest);
-            const elapsed = Date.now() - oldest.time;
-            console.log('elapsed', elapsed);
-            const timeLeft = ms_1.default('24h') - elapsed;
-            const nextPowerup = Date.now() + timeLeft;
-            console.log('msleft:', timeLeft);
-            return { nextPowerup, quotaAvailable: 0 };
-        }
-        else
-            return { quotaAvailable: freeDailyQuota - recentPowerups.length };
-    }
-    catch (error) {
-        console.error('checkQuota Error:', error.toString());
-        return { error: "account error", quotaAvailable: 0 };
-    }
-}
 async function registerUser(ctx) {
     try {
         'Checking User Registration...';
@@ -101,10 +71,12 @@ async function registerUser(ctx) {
             update: {}
         });
         console.log('User Registered', result);
+        return result.id;
     }
     catch (error) {
         console.log(error.toString());
         ctx.reply('Error: ' + error.toString());
+        return null;
     }
 }
 async function showMainMenu(ctx) {

@@ -41,15 +41,22 @@ export async function doAutoPowerup(payer: NameType, watch_account: NameType, cp
 }
 
 export interface FreePowerupResult {
-  status: 'success' | 'error' | 'reachedFreeQuota'
+  status: 'success' | 'error' | 'reachedFreeQuota' | 'blacklisted'
   powerupLog?: Logpowerup,
   txid?: string,
   recentPowerups?: Dopowerup[],
   errors?: any[]
   nextPowerup?: number
 }
+async function checkBlacklist(account: NameType) {
+  const result = await db.blacklist.findUnique({ where: { account: account.toString() } })
+  return result
+}
+
 export async function freePowerup(accountName: string | Name, params?: any): Promise<FreePowerupResult> {
   if (typeof accountName == 'string') accountName = Name.from(accountName)
+  const blacklisted = await checkBlacklist(accountName)
+  if (blacklisted) return { status: 'blacklisted', errors: [{ blacklisted: blacklisted.reason }] }
   const recentPowerups = await db.dopowerup.findMany({
     where: { receiver: accountName.toString(), payer: env.contractAccount.toString(), time: { gte: Date.now() - ms('24hr') }, failed: { not: true } },
     orderBy: { time: 'desc' },

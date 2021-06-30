@@ -35,7 +35,7 @@ const express_cache_middleware_1 = __importDefault(require("express-cache-middle
 const cache_manager_1 = __importDefault(require("cache-manager"));
 const limiter = express_rate_limit_1.default({
     windowMs: ms_1.default('12h'),
-    max: 20
+    max: 6
 });
 const limiter2 = express_rate_limit_1.default({
     windowMs: ms_1.default('30m'),
@@ -67,6 +67,7 @@ app.use('/freePowerup/:accountName', limiter, async (req, res) => {
         if (result?.status == 'error') {
             res.statusCode = 400;
         }
+        console.log(result);
         res.json({ result, rateLimit: req.rateLimit });
     }
     catch (error) {

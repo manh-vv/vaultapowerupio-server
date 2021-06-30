@@ -25,7 +25,7 @@ async function init() {
       const balance = (await getFullTable({ contract: env.contractAccount, tableName: Name.from('account'), scope: account }))[0].balance
       console.log(balance);
 
-      if (parseFloat(balance) < 0.003) {
+      if (parseFloat(balance) < 0.035) {
         console.log(account, balance);
         const result = await doAction(Name.from('withdraw'), Withdraw.from({ owner: account, quantity: balance, receiver: account }), null, [PermissionLevel.from("eospowerupio@powerup")], [env.keys[1]])
         console.log(result);

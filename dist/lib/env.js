@@ -16,7 +16,8 @@ const typed = {
     keys: untyped.keys.map(el => eosio_1.PrivateKey.from(el)),
     workerAccount: eosio_1.Name.from(untyped.workerAccount),
     workerPermission: eosio_1.Name.from(untyped.workerPermission),
-    telegramKey: untyped?.telegramKey
+    telegramKey: untyped?.telegramKey,
+    discordKey: untyped?.discordKey,
 };
 const config = typed;
 exports.default = config;

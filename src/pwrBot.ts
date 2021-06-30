@@ -78,8 +78,7 @@ async function init(owner?: NameType) {
     for (const owner of shuffle(owners)) {
       // console.log("Owner:", owner.toString())
       let watchAccounts: WatchlistRow[] = []
-      watchAccounts = (await getFullTable({ tableName: "watchlist", scope: owner, type: WatchlistRow }))
-
+      watchAccounts = (await getFullTable({ tableName: "watchlist", scope: owner, type: WatchlistRow })).filter(el => el.active)
       for (const watch of shuffle(watchAccounts)) {
         // console.time('checkWatch')
         await Promise.race([

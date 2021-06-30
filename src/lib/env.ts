@@ -11,6 +11,7 @@ interface eosioConfig {
   workerPermission: Name
   contractAccount: Name
   telegramKey?: string
+  discordKey?: string
 }
 type eosioConfigs = { [k in chains]?: eosioConfig }
 interface envType {
@@ -30,7 +31,8 @@ const typed: eosioConfig = {
   keys: untyped.keys.map(el => PrivateKey.from(el)),
   workerAccount: Name.from(untyped.workerAccount),
   workerPermission: Name.from(untyped.workerPermission),
-  telegramKey: untyped?.telegramKey
+  telegramKey: untyped?.telegramKey,
+  discordKey: untyped?.discordKey,
 }
 const config: eosioConfig = typed
 export default config

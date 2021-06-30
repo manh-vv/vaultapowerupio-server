@@ -1,5 +1,5 @@
 import { Name } from '@greymass/eosio'
-import { accountExists, sleep } from './lib/utils'
+import { accountExists, sleep, checkQuota, freeDailyQuota } from './lib/utils'
 import { Telegraf, Markup, Context } from 'telegraf'
 import { readFileSync } from 'fs-extra'
 import db from './lib/db'
@@ -10,8 +10,6 @@ import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
 TimeAgo.addDefaultLocale(en)
 const timeAgo = new TimeAgo("en-US")
-
-const freeDailyQuota = 7
 
 if (token === undefined) {
   throw new Error('telegramKey Missing!')
@@ -30,13 +28,14 @@ export default async function init(...inputs: any) {
       await ctx.replyWithPhoto({ source: readFileSync('../images/powerupBanner.jpg') }, { caption: "Welcome to eospowerup.io Bot, powered by Boid and Eden on EOS." })
       await showMainMenu(ctx)
     }).catch(err => console.error(err.toString()))
-    bot.command('test', async (ctx: Context) => {
-      registerUser(ctx)
-    }).catch(err => console.error(err.toString()))
+
+    // bot.command('test', async (ctx: Context) => {
+    //   registerUser(ctx)
+    // }).catch(err => console.error(err.toString()))
 
     bot.hears('Free PowerUp', async (ctx) => {
-      await registerUser(ctx)
-      const tgQuota = await checktgQuota(ctx.message.from.id)
+      const userid = await registerUser(ctx)
+      const tgQuota = await checkQuota(userid)
       if (tgQuota.error) {
         await ctx.reply(tgQuota.error)
         await showMainMenu(ctx)
@@ -65,31 +64,8 @@ export default async function init(...inputs: any) {
     console.error(error.toString())
   }
 }
-interface TgQuotaResult { nextPowerup?: number, quotaAvailable: number, error?: string }
-async function checktgQuota(tgid): Promise<TgQuotaResult> {
-  try {
-    const recentPowerups = await db.dopowerup.findMany({
-      where: { User: { telegramId: tgid }, payer: env.contractAccount.toString(), time: { gte: Date.now() - ms('24hr') }, failed: { not: true } },
-      orderBy: { time: 'desc' },
-    })
-    if (recentPowerups.length >= freeDailyQuota) {
-      console.log('found recent tg User powerups');
-      const oldest = recentPowerups[recentPowerups.length - 1]
-      console.log(oldest);
-      const elapsed = Date.now() - oldest.time
-      console.log('elapsed', elapsed);
-      const timeLeft = ms('24h') - elapsed
-      const nextPowerup = Date.now() + timeLeft
-      console.log('msleft:', timeLeft);
-      return { nextPowerup, quotaAvailable: 0 }
-    } else return { quotaAvailable: freeDailyQuota - recentPowerups.length }
-  } catch (error) {
-    console.error('checkQuota Error:', error.toString())
-    return { error: "account error", quotaAvailable: 0 }
-  }
-}
 
-async function registerUser(ctx: Context) {
+async function registerUser(ctx: Context): Promise<string> {
   try {
     'Checking User Registration...'
     console.log(ctx.message.from.id);
@@ -100,10 +76,12 @@ async function registerUser(ctx: Context) {
       update: {}
     })
     console.log('User Registered', result);
+    return result.id
 
   } catch (error) {
     console.log(error.toString())
     ctx.reply('Error: ' + error.toString())
+    return null
   }
 }
 
@@ -165,81 +143,3 @@ if (require.main === module) {
   init(...process.argv).catch(console.error)
     .then((result) => console.log('Finished'))
 }
-// init()
-
-    // bot.command('simple', (ctx) => {
-    //   return ctx.replyWithHTML(
-    //     '<b>Coke</b> or <i>Pepsi?</i>',
-    //     Markup.keyboard(['Coke', 'Pepsi'])
-    //   )
-    // })
-
-    // bot.command('inline', (ctx) => {
-    //   return ctx.reply('<b>Coke</b> or <i>Pepsi?</i>', {
-    //     parse_mode: 'HTML',
-    //     ...Markup.inlineKeyboard([
-    //       Markup.button.callback('Coke', 'Coke'),
-    //       Markup.button.callback('Pepsi', 'Pepsi')
-    //     ])
-    //   })
-    // })
-
-    // bot.command('random', (ctx) => {
-    //   return ctx.reply(
-    //     'random example',
-    //     Markup.inlineKeyboard([
-    //       Markup.button.callback('Coke', 'Coke'),
-    //       Markup.button.callback('Dr Pepper', 'Dr Pepper', Math.random() > 0.5),
-    //       Markup.button.callback('Pepsi', 'Pepsi')
-    //     ])
-    //   )
-    // })
-
-    // bot.command('caption', (ctx) => {
-    //   return ctx.replyWithPhoto({ url: 'https://picsum.photos/200/300/?random' },
-    //     {
-    //       caption: 'Caption',
-    //       parse_mode: 'Markdown',
-    //       ...Markup.inlineKeyboard([
-    //         Markup.button.callback('Plain', 'plain'),
-    //         Markup.button.callback('Italic', 'italic')
-    //       ])
-    //     }
-    //   )
-    // })
-
-    // bot.hears(/\/wrap (\d+)/, (ctx) => {
-    //   return ctx.reply(
-    //     'Keyboard wrap',
-    //     Markup.keyboard(['one', 'two', 'three', 'four', 'five', 'six'], {
-    //       columns: parseInt(ctx.match[1])
-    //     })
-    //   )
-    // })
-
-    // bot.action('Dr Pepper', (ctx, next) => {
-    //   return ctx.reply('👍').then(() => next())
-    // })
-
-    // bot.action('plain', async (ctx) => {
-    //   await ctx.answerCbQuery()
-    //   await ctx.editMessageCaption('Caption', Markup.inlineKeyboard([
-    //     Markup.button.callback('Plain', 'plain'),
-    //     Markup.button.callback('Italic', 'italic')
-    //   ]))
-    // })
-
-    // bot.action('italic', async (ctx) => {
-    //   await ctx.answerCbQuery()
-    //   await ctx.editMessageCaption('_Caption_', {
-    //     parse_mode: 'Markdown',
-    //     ...Markup.inlineKeyboard([
-    //       Markup.button.callback('Plain', 'plain'),
-    //       Markup.button.callback('* Italic *', 'italic')
-    //     ])
-    //   })
-    // })
-
-    // bot.action(/.+/, (ctx) => {
-    //   return ctx.answerCbQuery(`Oh, ${ ctx.match[0] } !Great choice`)
-    // })

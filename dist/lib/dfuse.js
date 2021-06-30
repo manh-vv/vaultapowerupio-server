@@ -4,7 +4,7 @@ const client_1 = require("@dfuse/client");
 global.fetch = require("node-fetch");
 global.WebSocket = require("ws");
 const client = client_1.createDfuseClient({
-    apiKey: 'a4ecdf66bfb59fd39ec51504e68b0c30',
+    apiKey: 'b9843b0f023c3f0852f6c6c0618201d2',
     network: "eos.dfuse.eosnation.io", streamClientOptions: {
         autoDisconnectSocket: false,
         autoRestartStreamsOnReconnect: true

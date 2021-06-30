@@ -206,10 +206,14 @@ export async function doAction(name: Name | string, data?: { [key: string]: any 
   if (apis.length > 4) {
     apis = apis.splice(0, 4)
   }
-  const timeoutTimer = ms('20s')
+  console.log('Pushing Tx using APIs:', apis.length, apis.map(el => el.endpoint.toString()));
+
+  const timeoutTimer = ms('10s')
   await Promise.all(apis.map(({ endpoint, rpc }) => {
     return Promise.race([
       new Promise((res) => {
+        console.log('Pushing action to endpoint:', endpoint.origin);
+
         rpc.push_transaction(signedTransaction).then(result => {
           receipts.push({ url: endpoint.origin, receipt: result.processed })
         }).catch((error) => {
@@ -223,7 +227,7 @@ export async function doAction(name: Name | string, data?: { [key: string]: any 
       }, timeoutTimer))
     ])
   }))
-  console.log(receipts, errors);
+  console.log('doAction finished;', receipts, errors);
   interface UniqueErrors {
     endpoints: string[]
     error: string

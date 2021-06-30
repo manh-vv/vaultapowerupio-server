@@ -11,7 +11,9 @@ const sleep = ms => new Promise(res => setTimeout(res, ms));
 const queries = {
     logpowerup: { search: `action:logpowerup notif:false receiver:${env_1.default.contractAccount.toString()}`, table: 'logpowerup' },
     logbuyram: { search: `action:logbuyram notif:false receiver:${env_1.default.contractAccount.toString()}`, table: 'logbuyram' },
-    transfer: { search: `account:eosio.token action:transfer receiver:${env_1.default.contractAccount.toString()} -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee`, table: 'transfer' }
+    transfer: { search: `account:eosio.token action:transfer receiver:${env_1.default.contractAccount.toString()} -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee`, table: 'transfer' },
+    regminer: { search: `account:gravyhftdefi action:regminer receiver:gravyhftdefi`, table: 'blacklist' },
+    grvmine: { search: `account:gravyhftdefi action:mine`, table: 'blacklist' }
 };
 function parseActions(action) {
     const data = action;
@@ -110,6 +112,14 @@ async function saveAction({ action, cursor, table, searchString }) {
             });
             console.log('Wrote Transfer:', result);
         }
+        else if (table == 'blacklist') {
+            const result = await db_1.default.blacklist.upsert({
+                where: { account: action.data?.miner },
+                create: { account: action.data?.miner, reason: "Gravy Mining" },
+                update: {}
+            });
+            console.log(result);
+        }
         const result = await db_1.default.cursor.upsert({
             where: { searchString },
             create: { searchString, cursor, lowBlock: action.block.num },
@@ -172,7 +182,13 @@ async function init(name, filter, replay) {
 if (process.argv[2] && require.main === module) {
     if (Object.keys(queries).find(el => el === process.argv[2])) {
         console.log("Starting:", process.argv[2]);
-        init(process.argv[2], process.argv[3], process.argv[4]);
+        let filter = process.argv[3];
+        let block = Number(process.argv[4]) || null;
+        if (Number(filter)) {
+            block = Number(filter);
+            filter = "";
+        }
+        init(process.argv[2], filter, block);
         setInterval(() => { init(process.argv[2], process.argv[3], process.argv[4]); }, ms_1.default('60s'));
     }
     else {

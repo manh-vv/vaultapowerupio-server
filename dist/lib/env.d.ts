@@ -6,6 +6,7 @@ interface eosioConfig {
     workerPermission: Name;
     contractAccount: Name;
     telegramKey?: string;
+    discordKey?: string;
 }
 declare const config: eosioConfig;
 export default config;

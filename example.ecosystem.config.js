@@ -37,6 +37,15 @@ module.exports = {
       }
     },
     {
+      name: "discordBot",
+      cwd: "./dist/",
+      script: "./discordBot.js",
+      args: null,
+      env: {
+        CHAIN: "eos"
+      }
+    },
+    {
       name: "generateStats",
       cwd: "./dist/",
       script: "./generateStats.js",

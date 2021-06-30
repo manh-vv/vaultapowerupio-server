@@ -13,8 +13,8 @@ import ExpressCache from 'express-cache-middleware'
 import cacheManager from 'cache-manager'
 
 const limiter = rateLimit({
-  windowMs: ms('12h'),
-  max: 20
+  windowMs: ms('24h'),
+  max: 6
 });
 
 const limiter2 = rateLimit({
@@ -56,6 +56,10 @@ app.use('/freePowerup/:accountName', limiter, async (req, res) => {
     if (result?.status == 'error') {
       res.statusCode = 400
     }
+    console.log(result)
+    // if (result.status == 'blacklisted') {
+    //   blacklistIP(req.ip)
+    // }
     res.json({ result, rateLimit: req.rateLimit })
   } catch (error) {
     res.statusCode = 500
@@ -63,6 +67,10 @@ app.use('/freePowerup/:accountName', limiter, async (req, res) => {
     res.json(error)
   }
 })
+
+// async function blacklistIP(ip: string) {
+// const blacklisted = await
+// }
 
 app.use('/studio', auth, proxy('http://localhost:5555'))
 cacheMiddleware.attach(app)

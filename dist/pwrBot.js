@@ -76,7 +76,7 @@ async function init(owner) {
             owners = [owner];
         for (const owner of utils_1.shuffle(owners)) {
             let watchAccounts = [];
-            watchAccounts = (await eosio_1.getFullTable({ tableName: "watchlist", scope: owner, type: eospowerupio_types_1.WatchlistRow }));
+            watchAccounts = (await eosio_1.getFullTable({ tableName: "watchlist", scope: owner, type: eospowerupio_types_1.WatchlistRow })).filter(el => el.active);
             for (const watch of utils_1.shuffle(watchAccounts)) {
                 await Promise.race([
                     checkWatchAccount(owner, watch),

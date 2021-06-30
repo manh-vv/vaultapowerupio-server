@@ -46,8 +46,6 @@ async function updateStats(data?: any) {
     })
     await Promise.all(getResults)
 
-
-
     const eosBal = parseFloat((await getFullTable({ contract: Name.from('eosio.token'), tableName: Name.from('accounts'), scope: env.contractAccount }))[0].balance)
     const internalEOSBal = parseFloat((await getFullTable({ contract: env.contractAccount, tableName: Name.from('account'), scope: env.contractAccount }))[0].balance)
     const registeredUsers = await db.user.aggregate({
@@ -56,15 +54,28 @@ async function updateStats(data?: any) {
     const monthAgo = Date.now() - ms('4w')
     console.log('monthAgo', monthAgo);
     const activeTgUsers = await db.user.aggregate({
-      where: { freePowerups: { some: { time: { gt: monthAgo } } } },
+      where: { freePowerups: { some: { time: { gt: monthAgo } } }, AND: { telegramId: { not: null } } },
+      _count: { _all: true }
+    })
+    const activeDiscordUsers = await db.user.aggregate({
+      where: { freePowerups: { some: { time: { gt: monthAgo } } }, AND: { discordId: { not: null } } },
       _count: { _all: true }
     })
     console.log(activeTgUsers._count._all)
+    const allFreePowerups = await db.logpowerup.aggregate({
+      where: { payer: { equals: env.contractAccount.toString() }, blockTime: { gt: Date.now() - ms('1d') } },
+      _count: { _all: true },
+      _sum: { cost: true }
+    })
+    console.log(allFreePowerups)
+    let freePowerups24hr = allFreePowerups._count._all
+    let freePowerupsCost24hr = allFreePowerups._sum.cost
 
     const recentPowerups = (await db.logpowerup.aggregate({
-      where: { blockTime: { gt: Date.now() - ms('1d') } },
+      where: { blockTime: { gt: Date.now() - ms('1d') }, AND: { payer: { not: env.contractAccount.toString() } } },
       _count: { _all: true },
-      _sum: { fee: true, cost: true }
+      _sum: { fee: true, cost: true },
+
     }))
 
     const autopowerups24hr = recentPowerups._count._all || 0
@@ -81,7 +92,7 @@ async function updateStats(data?: any) {
     const autobuyramfees24hr = autobuyram._sum.fee || 0
     const autobuyramCost24hr = autobuyram._sum.cost || 0
 
-    console.log('recentAutoPowerups', recentPowerups);
+    // console.log('recentAutoPowerups', recentPowerups);
 
     const extraStats = {
       autopowerupCost24hr,
@@ -95,16 +106,17 @@ async function updateStats(data?: any) {
       internalEOSBal,
       totalDeposited,
       activeTgUsers: activeTgUsers._count._all,
-      autopowerupfees24hr
+      autopowerupfees24hr,
+      freePowerups24hr,
+      freePowerupsCost24hr,
+      activeDiscordUsers: activeDiscordUsers._count._all
     }
 
     stats = Object.assign(stats, extraStats)
-    console.log(stats);
-    if (require.main != module) {
-      console.log('Send Data to mixpanel...');
-      mixpanel.track('stats', Object.assign({}, stats))
-    }
 
+    console.log(stats);
+    console.log('Send Data to mixpanel...');
+    mixpanel.track('stats', Object.assign({}, stats))
 
     await db.stats.create({
       data: {
@@ -121,7 +133,10 @@ async function updateStats(data?: any) {
         autobuyram24hr,
         autobuyramfees24hr,
         autopowerupCost24hr,
-        autobuyramCost24hr
+        autobuyramCost24hr,
+        freePowerups24hr,
+        freePowerupsCost24hr,
+        activeDiscordUsers: extraStats.activeDiscordUsers
       }
     })
     return stats

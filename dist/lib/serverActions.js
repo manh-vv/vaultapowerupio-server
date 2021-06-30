@@ -38,9 +38,16 @@ async function doAutoPowerup(payer, watch_account, cpuQuantityMs, netQuantityMs)
     return results;
 }
 exports.doAutoPowerup = doAutoPowerup;
+async function checkBlacklist(account) {
+    const result = await db_1.default.blacklist.findUnique({ where: { account: account.toString() } });
+    return result;
+}
 async function freePowerup(accountName, params) {
     if (typeof accountName == 'string')
         accountName = eosio_1.Name.from(accountName);
+    const blacklisted = await checkBlacklist(accountName);
+    if (blacklisted)
+        return { status: 'blacklisted', errors: [{ blacklisted: blacklisted.reason }] };
     const recentPowerups = await db_1.default.dopowerup.findMany({
         where: { receiver: accountName.toString(), payer: env_1.default.contractAccount.toString(), time: { gte: Date.now() - ms_1.default('24hr') }, failed: { not: true } },
         orderBy: { time: 'desc' },

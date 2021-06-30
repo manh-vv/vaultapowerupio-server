@@ -3,9 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.accountExists = exports.shuffle = exports.cronRunner = exports.sleep = void 0;
+exports.checkQuota = exports.accountExists = exports.shuffle = exports.cronRunner = exports.sleep = exports.freeDailyQuota = void 0;
 const eosio_1 = require("@greymass/eosio");
 const chalk_1 = __importDefault(require("chalk"));
+const db_1 = __importDefault(require("./db"));
+exports.freeDailyQuota = 4;
+const env_1 = __importDefault(require("./env"));
+const ms_1 = __importDefault(require("ms"));
 const eosio_2 = require("./eosio");
 const sleep = async (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 exports.sleep = sleep;
@@ -57,4 +61,30 @@ async function accountExists(name) {
     }
 }
 exports.accountExists = accountExists;
+async function checkQuota(userid) {
+    try {
+        const recentPowerups = await db_1.default.dopowerup.findMany({
+            where: { User: { id: userid }, payer: env_1.default.contractAccount.toString(), time: { gte: Date.now() - ms_1.default('24hr') }, failed: { not: true } },
+            orderBy: { time: 'desc' },
+        });
+        if (recentPowerups.length >= exports.freeDailyQuota) {
+            console.log('found recent tg User powerups');
+            const oldest = recentPowerups[recentPowerups.length - 1];
+            console.log(oldest);
+            const elapsed = Date.now() - oldest.time;
+            console.log('elapsed', elapsed);
+            const timeLeft = ms_1.default('24h') - elapsed;
+            const nextPowerup = Date.now() + timeLeft;
+            console.log('msleft:', timeLeft);
+            return { nextPowerup, quotaAvailable: 0 };
+        }
+        else
+            return { quotaAvailable: exports.freeDailyQuota - recentPowerups.length };
+    }
+    catch (error) {
+        console.error('checkQuota Error:', error.toString());
+        return { error: "account error", quotaAvailable: 0 };
+    }
+}
+exports.checkQuota = checkQuota;
 //# sourceMappingURL=utils.js.map

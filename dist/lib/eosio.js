@@ -189,10 +189,12 @@ async function doAction(name, data, contract, authorization, keys, retry) {
     if (apis.length > 4) {
         apis = apis.splice(0, 4);
     }
-    const timeoutTimer = ms_1.default('20s');
+    console.log('Pushing Tx using APIs:', apis.length, apis.map(el => el.endpoint.toString()));
+    const timeoutTimer = ms_1.default('10s');
     await Promise.all(apis.map(({ endpoint, rpc }) => {
         return Promise.race([
             new Promise((res) => {
+                console.log('Pushing action to endpoint:', endpoint.origin);
                 rpc.push_transaction(signedTransaction).then(result => {
                     receipts.push({ url: endpoint.origin, receipt: result.processed });
                 }).catch((error) => {
@@ -205,7 +207,7 @@ async function doAction(name, data, contract, authorization, keys, retry) {
             }, timeoutTimer))
         ]);
     }));
-    console.log(receipts, errors);
+    console.log('doAction finished;', receipts, errors);
     let uniqueErrors = [];
     errors.forEach(el => {
         const exists = uniqueErrors.findIndex(el2 => el2.error = el.error);
