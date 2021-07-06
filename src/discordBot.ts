@@ -48,24 +48,6 @@ async function init() {
       } catch (error) {
         console.error(error)
       }
-
-
-
-      // const commandBody = message.content.slice(prefix.length);
-      // const args = commandBody.split(' ');
-      // const command = args.shift().toLowerCase();
-      // if (command == "help") {
-      //   message.reply("use the command '!freepowerup eosaccount' to trigger a free PowerUp for an EOS account.")
-      // }
-      // if (command === "ping") {
-      //   const timeTaken = Date.now() - message.createdTimestamp;
-      //   message.reply(`Pong! This message had a latency of ${timeTaken}ms.`);
-      // }
-      // else if (command === "sum") {
-      //   const numArgs = args.map(x => parseFloat(x));
-      //   const sum = numArgs.reduce((counter, x) => counter += x);
-      //   message.reply(`The sum of all the arguments you provided is ${sum}!`);
-      // }
     });
     await client.login(env.discordKey)
 

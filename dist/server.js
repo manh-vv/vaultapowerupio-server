@@ -31,11 +31,14 @@ const serverActions = __importStar(require("./lib/serverActions"));
 app.set('trust proxy', 1);
 const basicAuth = __importStar(require("express-basic-auth"));
 var proxy = require('express-http-proxy');
+const istorexit_1 = __importDefault(require("istorexit"));
+const express_blacklist_1 = __importDefault(require("express-blacklist"));
+app.use(express_blacklist_1.default.blockRequests('../blacklist.txt'));
 const express_cache_middleware_1 = __importDefault(require("express-cache-middleware"));
 const cache_manager_1 = __importDefault(require("cache-manager"));
 const limiter = express_rate_limit_1.default({
-    windowMs: ms_1.default('12h'),
-    max: 6
+    windowMs: ms_1.default('24h'),
+    max: 12
 });
 const limiter2 = express_rate_limit_1.default({
     windowMs: ms_1.default('30m'),
@@ -54,9 +57,32 @@ const auth = basicAuth.default({
 });
 app.use(express_1.default.json());
 app.use(cors());
+let blocklist = [];
+let whitelist = [];
 app.use(async function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
-    next();
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const exit = () => {
+        console.log('Blocking request From:', ip);
+        res.statusCode = 403;
+        res.end();
+        return;
+    };
+    if (whitelist.some(el => el == ip))
+        return next();
+    else if (blocklist.some(el => el == ip))
+        return exit();
+    else if (await istorexit_1.default(ip)) {
+        console.log('Blocked Tor:', ip);
+        blocklist.push(ip);
+        console.log('blocklist length:', blocklist.length);
+        return exit();
+    }
+    else {
+        whitelist.push(ip);
+        console.log('Whitelist length:', whitelist.length);
+        next();
+    }
 });
 app.use('/freePowerup/:accountName', limiter, async (req, res) => {
     try {

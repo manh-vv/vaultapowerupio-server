@@ -7,10 +7,14 @@ import * as serverActions from './lib/serverActions'
 app.set('trust proxy', 1);
 import * as basicAuth from 'express-basic-auth'
 var proxy = require('express-http-proxy');
+import checkTor from 'istorexit'
 
+import blacklist from 'express-blacklist'
+app.use(blacklist.blockRequests('../blacklist.txt'));
 
 import ExpressCache from 'express-cache-middleware'
 import cacheManager from 'cache-manager'
+import { exit } from 'process'
 
 const limiter = rateLimit({
   windowMs: ms('24h'),
@@ -19,7 +23,7 @@ const limiter = rateLimit({
 
 const limiter2 = rateLimit({
   windowMs: ms('30m'),
-  max: 100
+  max: 20
 });
 
 const cacheMiddleware = new ExpressCache(
@@ -42,9 +46,32 @@ app.use(express.json())
 
 app.use(cors())
 
+let blocklist = []
+let whitelist = []
+
 app.use(async function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
-  next()
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+  const exit = () => {
+    console.log('Blocking request From:', ip);
+
+    res.statusCode = 403
+    res.end()
+    return
+  }
+  if (whitelist.some(el => el == ip)) return next()
+  else if (blocklist.some(el => el == ip)) return exit()
+  else if (await checkTor(ip)) {
+    console.log('Blocked Tor:', ip)
+    blocklist.push(ip)
+    console.log('blocklist length:', blocklist.length)
+    return exit()
+  }
+  else {
+    whitelist.push(ip)
+    console.log('Whitelist length:', whitelist.length)
+    next()
+  }
 })
 
 app.use('/freePowerup/:accountName', limiter, async (req, res) => {
@@ -57,9 +84,6 @@ app.use('/freePowerup/:accountName', limiter, async (req, res) => {
       res.statusCode = 400
     }
     console.log(result)
-    // if (result.status == 'blacklisted') {
-    //   blacklistIP(req.ip)
-    // }
     res.json({ result, rateLimit: req.rateLimit })
   } catch (error) {
     res.statusCode = 500
@@ -67,10 +91,6 @@ app.use('/freePowerup/:accountName', limiter, async (req, res) => {
     res.json(error)
   }
 })
-
-// async function blacklistIP(ip: string) {
-// const blacklisted = await
-// }
 
 app.use('/studio', auth, proxy('http://localhost:5555'))
 cacheMiddleware.attach(app)

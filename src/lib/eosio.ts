@@ -187,7 +187,7 @@ export async function doAction(name: Name | string, data?: { [key: string]: any 
     account: contract,
     name, data
   })
-  console.log("Pushing:", JSON.stringify(data, null, 2), JSON.stringify(action.toJSON(), null, 2));
+  // console.log("Pushing:", JSON.stringify(data, null, 2), JSON.stringify(action.toJSON(), null, 2));
 
   const transaction = Transaction.from({
     ...header,
@@ -206,13 +206,13 @@ export async function doAction(name: Name | string, data?: { [key: string]: any 
   if (apis.length > 4) {
     apis = apis.splice(0, 4)
   }
-  console.log('Pushing Tx using APIs:', apis.length, apis.map(el => el.endpoint.toString()));
+  // console.log('Pushing Tx using APIs:', apis.length, apis.map(el => el.endpoint.toString()));
 
   const timeoutTimer = ms('10s')
   await Promise.all(apis.map(({ endpoint, rpc }) => {
     return Promise.race([
       new Promise((res) => {
-        console.log('Pushing action to endpoint:', endpoint.origin);
+        // console.log('Pushing action to endpoint:', endpoint.origin);
 
         rpc.push_transaction(signedTransaction).then(result => {
           receipts.push({ url: endpoint.origin, receipt: result.processed })
@@ -227,7 +227,7 @@ export async function doAction(name: Name | string, data?: { [key: string]: any 
       }, timeoutTimer))
     ])
   }))
-  console.log('doAction finished;', receipts, errors);
+  // console.log('doAction finished;', receipts, errors);
   interface UniqueErrors {
     endpoints: string[]
     error: string

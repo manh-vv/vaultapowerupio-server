@@ -189,7 +189,8 @@ if (process.argv[2] && require.main === module) {
             filter = "";
         }
         init(process.argv[2], filter, block);
-        setInterval(() => { init(process.argv[2], process.argv[3], process.argv[4]); }, ms_1.default('60s'));
+        if (!block)
+            setInterval(() => { init(process.argv[2], process.argv[3], process.argv[4]); }, ms_1.default('60s'));
     }
     else {
         console.error("Erorr: invalid query");
