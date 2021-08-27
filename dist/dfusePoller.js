@@ -188,9 +188,12 @@ if (process.argv[2] && require.main === module) {
             block = Number(filter);
             filter = "";
         }
-        init(process.argv[2], filter, block);
-        if (!block)
-            setInterval(() => { init(process.argv[2], process.argv[3], process.argv[4]); }, ms_1.default('60s'));
+        init(process.argv[2], filter, block).finally(() => {
+            if (!block)
+                setTimeout(() => { cleanExit(); }, ms_1.default('60s'));
+            else
+                cleanExit();
+        });
     }
     else {
         console.error("Erorr: invalid query");
@@ -199,4 +202,10 @@ if (process.argv[2] && require.main === module) {
 }
 else
     process.exit();
+async function cleanExit() {
+    console.log('Starting clean exit');
+    await db_1.default.$disconnect();
+    dfuse_1.default.release();
+    process.kill(process.pid, 'SIGTERM');
+}
 //# sourceMappingURL=dfusePoller.js.map

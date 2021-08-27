@@ -18,12 +18,12 @@ import { exit } from 'process'
 
 const limiter = rateLimit({
   windowMs: ms('24h'),
-  max: 6
+  max: 4
 });
 
 const limiter2 = rateLimit({
   windowMs: ms('30m'),
-  max: 20
+  max: 10
 });
 
 const cacheMiddleware = new ExpressCache(
@@ -40,7 +40,6 @@ const auth = basicAuth.default({
   challenge: true,
   realm: 'eospowerupio'
 })
-
 
 app.use(express.json())
 

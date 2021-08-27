@@ -8,8 +8,11 @@ const client = createDfuseClient({
   // authentication: false,
   network: "eos.dfuse.eosnation.io", streamClientOptions: {
     autoDisconnectSocket: false,
-    autoRestartStreamsOnReconnect: true
+    autoRestartStreamsOnReconnect: true,
+    socketOptions: { autoReconnect: true, keepAlive: true }
   }
 })
+
+
 
 export default client

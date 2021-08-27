@@ -193,11 +193,19 @@ if (process.argv[2] && require.main === module) {
       block = Number(filter)
       filter = ""
     }
-    init(process.argv[2], filter, block)
-    if (!block) setInterval(() => { init(process.argv[2], process.argv[3], process.argv[4]) }, ms('60s'))
-
+    init(process.argv[2], filter, block).finally(() => {
+      if (!block) setTimeout(() => { cleanExit() }, ms('60s'))
+      else cleanExit()
+    })
   } else {
     console.error("Erorr: invalid query")
     process.exit()
   }
 } else process.exit()
+
+async function cleanExit() {
+  console.log('Starting clean exit');
+  await db.$disconnect()
+  dfuse.release()
+  process.kill(process.pid, 'SIGTERM')
+}
