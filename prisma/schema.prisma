@@ -138,6 +138,7 @@ model Stats {
   freePowerups24hr     Int    @default(0)
   freePowerupsCost24hr Float  @default(0)
   createdAt            Int
+  rpcErrorStats        String @default("")
 
   @@index([createdAt])
 }
@@ -150,4 +151,5 @@ model rpcErrors {
 
   @@index([endpoint])
   @@index([error])
+  @@index([time])
 }

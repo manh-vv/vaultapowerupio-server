@@ -23,6 +23,7 @@ export default async function init(...inputs: any) {
   try {
     bot.use(Telegraf.log())
 
+
     bot.command('start', async (ctx: Context) => {
       registerUser(ctx)
       await ctx.replyWithPhoto({ source: readFileSync('../images/powerupBanner.jpg') }, { caption: "Welcome to eospowerup.io Bot, powered by Boid and Eden on EOS." })
@@ -94,6 +95,7 @@ async function triggerPowerUp(ctx: Context, payer: string, name: string) {
   name = name.trim().toLowerCase()
   const valid = await accountExists(name)
   if (!valid) return bot.telegram.editMessageText(ctx.chat.id, statusMsg.message_id, null, name + ' is not a valid EOS Account')
+  ctx.replyWithPhoto('https://eospowerup.io/eostarter-sm.jpg', { caption: "Now that you powered-up your EOS account, power-up your taste buds with these sweet Tartiers NFTs. Available now at eostarter.org" })
 
   console.log(valid);
   let dots: string[] = []

@@ -84,9 +84,15 @@ async function freePowerup(accountName, params) {
 }
 exports.freePowerup = freePowerup;
 async function getStats() {
-    const stats = await db_1.default.stats.findFirst({
+    let stats = await db_1.default.stats.findFirst({
         take: 1, orderBy: { createdAt: 'desc' }
     });
+    try {
+        stats.rpcErrorStats = JSON.parse(stats.rpcErrorStats);
+    }
+    catch (error) {
+        console.error(error);
+    }
     return stats;
 }
 exports.getStats = getStats;

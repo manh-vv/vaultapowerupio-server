@@ -45,6 +45,13 @@ async function updateStats(data?: any) {
       }))
     })
     await Promise.all(getResults)
+    const errors = await db.rpcErrors.findMany({ where: { time: { gt: Date.now() - ms('2h') } } })
+
+    const rpcErrorStats = {}
+    for (const error of errors) {
+      if (rpcErrorStats[error.endpoint]) rpcErrorStats[error.endpoint]++
+      else rpcErrorStats[error.endpoint] = 1
+    }
 
     const eosBal = parseFloat((await getFullTable({ contract: Name.from('eosio.token'), tableName: Name.from('accounts'), scope: env.contractAccount }))[0].balance)
     const internalEOSBal = parseFloat((await getFullTable({ contract: env.contractAccount, tableName: Name.from('account'), scope: env.contractAccount }))[0].balance)
@@ -69,7 +76,7 @@ async function updateStats(data?: any) {
     })
     console.log(allFreePowerups)
     let freePowerups24hr = allFreePowerups._count._all
-    let freePowerupsCost24hr = allFreePowerups._sum.cost
+    let freePowerupsCost24hr = allFreePowerups._sum.cost || 0
 
     const recentPowerups = (await db.logpowerup.aggregate({
       where: { blockTime: { gt: Date.now() - ms('1d') }, AND: { payer: { not: env.contractAccount.toString() } } },
@@ -101,6 +108,7 @@ async function updateStats(data?: any) {
       autobuyramfees24hr,
       autopowerups24hr,
       totalWatched,
+      rpcErrorStats,
       registeredUsersTotal: registeredUsers._count.id,
       eosBal,
       internalEOSBal,
@@ -136,7 +144,8 @@ async function updateStats(data?: any) {
         autobuyramCost24hr,
         freePowerups24hr,
         freePowerupsCost24hr,
-        activeDiscordUsers: extraStats.activeDiscordUsers
+        activeDiscordUsers: extraStats.activeDiscordUsers,
+        rpcErrorStats: JSON.stringify(rpcErrorStats)
       }
     })
     return stats

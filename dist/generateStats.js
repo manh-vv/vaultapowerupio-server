@@ -46,6 +46,14 @@ async function updateStats(data) {
             }));
         });
         await Promise.all(getResults);
+        const errors = await db_1.default.rpcErrors.findMany({ where: { time: { gt: Date.now() - ms_1.default('24h') } } });
+        const rpcErrorStats = {};
+        for (const error of errors) {
+            if (rpcErrorStats[error.endpoint])
+                rpcErrorStats[error.endpoint]++;
+            else
+                rpcErrorStats[error.endpoint] = 1;
+        }
         const eosBal = parseFloat((await eosio_1.getFullTable({ contract: eosio_2.Name.from('eosio.token'), tableName: eosio_2.Name.from('accounts'), scope: env_1.default.contractAccount }))[0].balance);
         const internalEOSBal = parseFloat((await eosio_1.getFullTable({ contract: env_1.default.contractAccount, tableName: eosio_2.Name.from('account'), scope: env_1.default.contractAccount }))[0].balance);
         const registeredUsers = await db_1.default.user.aggregate({
@@ -69,7 +77,7 @@ async function updateStats(data) {
         });
         console.log(allFreePowerups);
         let freePowerups24hr = allFreePowerups._count._all;
-        let freePowerupsCost24hr = allFreePowerups._sum.cost;
+        let freePowerupsCost24hr = allFreePowerups._sum.cost || 0;
         const recentPowerups = (await db_1.default.logpowerup.aggregate({
             where: { blockTime: { gt: Date.now() - ms_1.default('1d') }, AND: { payer: { not: env_1.default.contractAccount.toString() } } },
             _count: { _all: true },
@@ -93,6 +101,7 @@ async function updateStats(data) {
             autobuyramfees24hr,
             autopowerups24hr,
             totalWatched,
+            rpcErrorStats,
             registeredUsersTotal: registeredUsers._count.id,
             eosBal,
             internalEOSBal,
@@ -125,7 +134,8 @@ async function updateStats(data) {
                 autobuyramCost24hr,
                 freePowerups24hr,
                 freePowerupsCost24hr,
-                activeDiscordUsers: extraStats.activeDiscordUsers
+                activeDiscordUsers: extraStats.activeDiscordUsers,
+                rpcErrorStats: JSON.stringify(rpcErrorStats)
             }
         });
         return stats;

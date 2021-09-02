@@ -89,10 +89,13 @@ export async function getResouceCosts(retry?: number): Promise<ResourceCosts | n
 
 export async function safeDo(cb: string, params?: any, retry?: number): Promise<any | null> {
   if (!retry) retry = 0
+  const rpc = pickRpc()
+  const url = rpc.endpoint.toString()
+  console.log('Try rpc:', url);
+
   try {
     const doit = async () => {
-      const rpc = pickRpc()
-      const url = rpc.endpoint.toString()
+
       try {
         const result = (await rpc.rpc[cb](params))
         return result
@@ -118,9 +121,9 @@ export async function safeDo(cb: string, params?: any, retry?: number): Promise<
 
     return result
   } catch (error) {
-    // console.error('DoRequest Error:', error.toString())
-    // console.error("RETRY", retry);
+    console.error('DoRequest Error:', url)
     retry++
+    console.error("RETRY", retry);
     if (retry < 5) return safeDo(cb, params, retry)
   }
 }

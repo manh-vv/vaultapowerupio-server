@@ -67,10 +67,11 @@ exports.getResouceCosts = getResouceCosts;
 async function safeDo(cb, params, retry) {
     if (!retry)
         retry = 0;
+    const rpc = pickRpc();
+    const url = rpc.endpoint.toString();
+    console.log('Try rpc:', url);
     try {
         const doit = async () => {
-            const rpc = pickRpc();
-            const url = rpc.endpoint.toString();
             try {
                 const result = (await rpc.rpc[cb](params));
                 return result;
@@ -96,7 +97,9 @@ async function safeDo(cb, params, retry) {
         return result;
     }
     catch (error) {
+        console.error('DoRequest Error:', url);
         retry++;
+        console.error("RETRY", retry);
         if (retry < 5)
             return safeDo(cb, params, retry);
     }

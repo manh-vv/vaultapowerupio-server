@@ -38,11 +38,11 @@ const express_cache_middleware_1 = __importDefault(require("express-cache-middle
 const cache_manager_1 = __importDefault(require("cache-manager"));
 const limiter = express_rate_limit_1.default({
     windowMs: ms_1.default('24h'),
-    max: 6
+    max: 4
 });
 const limiter2 = express_rate_limit_1.default({
     windowMs: ms_1.default('30m'),
-    max: 20
+    max: 10
 });
 const cacheMiddleware = new express_cache_middleware_1.default(cache_manager_1.default.caching({
     max: 100,

@@ -88,6 +88,7 @@ async function triggerPowerUp(ctx, payer, name) {
     const valid = await utils_1.accountExists(name);
     if (!valid)
         return bot.telegram.editMessageText(ctx.chat.id, statusMsg.message_id, null, name + ' is not a valid EOS Account');
+    ctx.replyWithPhoto('https://eospowerup.io/eostarter-sm.jpg', { caption: "Now that you powered-up your EOS account, power-up your taste buds with these sweet Tartiers NFTs. Available now at eostarter.org" });
     console.log(valid);
     let dots = [];
     let powerupResult;

@@ -100,9 +100,14 @@ export async function freePowerup(accountName: string | Name, params?: any): Pro
 
 
 export async function getStats() {
-  const stats = await db.stats.findFirst({
+  let stats = await db.stats.findFirst({
     take: 1, orderBy: { createdAt: 'desc' }
   })
+  try {
+    stats.rpcErrorStats = JSON.parse(stats.rpcErrorStats)
+  } catch (error) {
+    console.error(error)
+  }
   return stats
 }
 
