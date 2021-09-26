@@ -46,7 +46,7 @@ async function updateStats(data) {
             }));
         });
         await Promise.all(getResults);
-        const errors = await db_1.default.rpcErrors.findMany({ where: { time: { gt: Date.now() - ms_1.default('24h') } } });
+        const errors = await db_1.default.rpcErrors.findMany({ where: { time: { gt: Date.now() - ms_1.default('2h') } } });
         const rpcErrorStats = {};
         for (const error of errors) {
             if (rpcErrorStats[error.endpoint])

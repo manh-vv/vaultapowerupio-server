@@ -78,7 +78,7 @@ async function safeDo(cb, params, retry) {
             }
             catch (error) {
                 const errorMsg = error.toString();
-                console.error('safeDo Error:', rpc.endpoint.toString(), errorMsg);
+                console.error('safeDo Error:', rpc.endpoint.toString(), errorMsg, error);
                 if (cb == 'get_account' && (errorMsg.search('unknown key') > -1)) {
                     retry = 5;
                     throw (error);

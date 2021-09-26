@@ -54,8 +54,6 @@ export async function accountExists(name: string) {
     console.log("can't find account", error.toString());
     return false
   }
-
-
 }
 
 interface QuotaResult { nextPowerup?: number, quotaAvailable: number, error?: string }
