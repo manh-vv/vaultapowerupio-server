@@ -47,9 +47,10 @@ async function init(...inputs) {
                 await ctx.reply(`You have ${tgQuota.quotaAvailable} of ${utils_1.freeDailyQuota} free PowerUps available today.`);
             }
             await ctx.reply('Enter the name of the EOS account to PowerUp');
-            bot.hears(RegExp('[\s\S]*'), async (ctx) => {
+            const listener = bot.hears(RegExp('[\s\S]*'), async (ctx) => {
                 await triggerPowerUp(ctx, env_1.default.contractAccount.toString(), ctx.message.text);
                 await showMainMenu(ctx);
+                listener.stop();
             });
         }).catch(err => console.error(err.toString()));
         bot.launch();
@@ -142,10 +143,5 @@ if (require.main === module) {
         .then((result) => console.log('Finished'));
 }
 async function displayAd(ctx) {
-    return ctx.replyWithPhoto({ source: fs_extra_1.readFileSync('../images/efx-hackathon.jpg') }, {
-        caption: `<strong>Join now and build a dApp on Effect Network-the decentralized gateway to the world's talent.</strong>
-    <a href="https://effect-network-hackathon.devpost.com/">Join Hackathon</a>
-    `, parse_mode: "HTML"
-    });
 }
 //# sourceMappingURL=tgBot.js.map

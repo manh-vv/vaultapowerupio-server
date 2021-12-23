@@ -53,9 +53,10 @@ export default async function init(...inputs: any) {
         await ctx.reply(`You have ${tgQuota.quotaAvailable} of ${freeDailyQuota} free PowerUps available today.`)
       }
       await ctx.reply('Enter the name of the EOS account to PowerUp')
-      bot.hears(RegExp('[\s\S]*'), async ctx => {
+      const listener = bot.hears(RegExp('[\s\S]*'), async ctx => {
         await triggerPowerUp(ctx, env.contractAccount.toString(), ctx.message.text)
         await showMainMenu(ctx)
+        listener.stop()
       })
     }).catch(err => console.error(err.toString()))
 
@@ -151,9 +152,12 @@ if (require.main === module) {
 
 
 async function displayAd(ctx: Context) {
-  return ctx.replyWithPhoto({ source: readFileSync('../images/efx-hackathon.jpg') }, {
-    caption: `<strong>Join now and build a dApp on Effect Network-the decentralized gateway to the world's talent.</strong>
-    <a href="https://effect-network-hackathon.devpost.com/">Join Hackathon</a>
-    `, parse_mode: "HTML"
-  })
+  // return ctx.replyWithPhoto({ source: readFileSync('../images/efx-hackathon.jpg') }, {
+  //   caption: `<strong>Join now and build a dApp on Effect Network-the decentralized gateway to the world's talent.</strong>
+  //   <a href="https://effect-network-hackathon.devpost.com/">Join Hackathon</a>
+  //   `, parse_mode: "HTML"
+  // })
+  ctx.reply("🙏 You can help maintain free community PowerUps by sending any amount of EOS to eospowerupio with the memo donation.")
+  ctx.reply("🚨 Donate at least 1 EOS to be included in the PowerUp NFT appreciation drop.")
+  ctx.reply("🎄 Happy holidays from EOS PowerUp!")
 }
