@@ -40,6 +40,7 @@ async function init(...inputs) {
         ⏲️ Next free PowerUp available:
         ${timeAgo.format(new Date(tgQuota.nextPowerup))}
         `);
+                await displayAd(ctx);
                 return showMainMenu(ctx);
             }
             else {
@@ -83,14 +84,12 @@ async function showMainMenu(ctx) {
     await ctx.reply('Choose an action below...', telegraf_1.Markup.keyboard(['Free PowerUp']).resize().oneTime());
 }
 async function triggerPowerUp(ctx, payer, name) {
+    displayAd(ctx);
     const statusMsg = await ctx.reply('Validating Account...');
     name = name.trim().toLowerCase();
     const valid = await utils_1.accountExists(name);
     if (!valid)
         return bot.telegram.editMessageText(ctx.chat.id, statusMsg.message_id, null, name + ' is not a valid EOS Account');
-    ctx.replyWithPhoto('https://eospowerup.io/banner_bee.jpg', {
-        caption: `<strong>EOS Marketing Needs YOU! Join EOS Bees Promote #EOS Earn $EOS t.me/eosbees</strong>`, parse_mode: "HTML"
-    });
     console.log(valid);
     let dots = [];
     let powerupResult;
@@ -127,10 +126,11 @@ async function triggerPowerUp(ctx, payer, name) {
     else if (powerupResult.status == 'reachedFreeQuota') {
         bot.telegram.deleteMessage(ctx.chat.id, statusMsg.message_id).catch(err => console.error(err.toString()));
         await ctx.replyWithHTML(`
-    <strong>${name} Free Quota Reached</strong>
+    <strong>${name} Free Quota Reached!</strong>
     ⏲️ Next free PowerUp available:
     ${new Date(powerupResult.nextPowerup).toUTCString()}
   `);
+        displayAd(ctx);
     }
     else {
         await ctx.reply(JSON.stringify(powerupResult));
@@ -140,5 +140,12 @@ if (require.main === module) {
     console.log('Starting Telegram Bot');
     init(...process.argv).catch(console.error)
         .then((result) => console.log('Finished'));
+}
+async function displayAd(ctx) {
+    return ctx.replyWithPhoto({ source: fs_extra_1.readFileSync('../images/efx-hackathon.jpg') }, {
+        caption: `<strong>Join now and build a dApp on Effect Network-the decentralized gateway to the world's talent.</strong>
+    <a href="https://effect-network-hackathon.devpost.com/">Join Hackathon</a>
+    `, parse_mode: "HTML"
+    });
 }
 //# sourceMappingURL=tgBot.js.map

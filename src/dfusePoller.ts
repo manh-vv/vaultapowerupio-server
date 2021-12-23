@@ -36,21 +36,29 @@ function parseActions(action: any): action[] {
 }
 
 async function runQuery(dfuseQuery: string, cursor: string, low: number, table: string, query: string) {
-  await dfuse.graphql(dfuseQuery, async (message, stream) => {
-    if (message.type === "error") {
-      console.error("An error occurred", message.errors, message.terminal)
-    } else if (message.type === "data") {
-      const results = message.data.searchTransactionsForward.results
-      for (const result of results) {
-        const parsedActions = parseActions(result)
-        console.log(parsedActions);
-        await writeActions(parsedActions.map(action => { return { action, cursor: result.cursor, table, searchString: query } }))
+  return new Promise<void>((res) => {
+    dfuse.graphql(dfuseQuery, async (message, stream) => {
+      if (message.type === "error") {
+        console.error("An error occurred", message.errors, message.terminal)
+      } else if (message.type === "data") {
+        const results = message.data.searchTransactionsForward.results
+        for (const result of results) {
+          const parsedActions = parseActions(result)
+          console.log(parsedActions);
+          await writeActions(parsedActions.map(action => { return { action, cursor: result.cursor, table, searchString: query } }))
+        }
+      } else if (message.type === "complete") {
+        console.log("Stream completed")
+        stream.close()
+        res()
       }
-    } else if (message.type === "complete") {
-      console.log("Stream completed")
-      stream.close()
-    }
-  }, { variables: { cursor, low, limit: 100 } }).catch(async (error) => { console.error('dfuse gql error:', error) })
+    }, { variables: { cursor, low, limit: 100 } })
+      .catch(async (error) => {
+        console.error('dfuse gql error:', error)
+        await sleep(ms('30s'))
+        cleanExit()
+      })
+  })
 }
 
 
@@ -176,7 +184,7 @@ async function init(name, filter, replay) {
       }
     }`
 
-    runQuery(streamTransfer, null, low, queries[name].table, query)
+    await runQuery(streamTransfer, null, low, queries[name].table, query)
 
   } catch (error) {
     console.error("INIT ERROR:", error)
@@ -193,8 +201,9 @@ if (process.argv[2] && require.main === module) {
       block = Number(filter)
       filter = ""
     }
-    init(process.argv[2], filter, block).finally(() => {
-      if (!block) setTimeout(() => { cleanExit() }, ms('60s'))
+    init(process.argv[2], filter, block).finally(async () => {
+      await sleep(ms('60s'))
+      if (!block) setTimeout(() => { cleanExit() }, ms('10s'))
       else cleanExit()
     })
   } else {

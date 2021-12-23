@@ -47,6 +47,7 @@ export default async function init(...inputs: any) {
         ⏲️ Next free PowerUp available:
         ${timeAgo.format(new Date(tgQuota.nextPowerup))}
         `)
+        await displayAd(ctx)
         return showMainMenu(ctx)
       } else {
         await ctx.reply(`You have ${tgQuota.quotaAvailable} of ${freeDailyQuota} free PowerUps available today.`)
@@ -91,13 +92,11 @@ async function showMainMenu(ctx: Context) {
 }
 
 async function triggerPowerUp(ctx: Context, payer: string, name: string) {
+  displayAd(ctx)
   const statusMsg = await ctx.reply('Validating Account...')
   name = name.trim().toLowerCase()
   const valid = await accountExists(name)
   if (!valid) return bot.telegram.editMessageText(ctx.chat.id, statusMsg.message_id, null, name + ' is not a valid EOS Account')
-  ctx.replyWithPhoto('https://eospowerup.io/banner_bee.jpg', {
-    caption: `<strong>EOS Marketing Needs YOU! Join EOS Bees Promote #EOS Earn $EOS t.me/eosbees</strong>`, parse_mode: "HTML"
-  })
 
   console.log(valid);
   let dots: string[] = []
@@ -131,12 +130,14 @@ async function triggerPowerUp(ctx: Context, payer: string, name: string) {
     🔗 <a href="https://bloks.io/transaction/${powerupResult.txid}">txid</a>
   `)
   } else if (powerupResult.status == 'reachedFreeQuota') {
+
     bot.telegram.deleteMessage(ctx.chat.id, statusMsg.message_id).catch(err => console.error(err.toString()))
     await ctx.replyWithHTML(`
-    <strong>${name} Free Quota Reached</strong>
+    <strong>${name} Free Quota Reached!</strong>
     ⏲️ Next free PowerUp available:
     ${new Date(powerupResult.nextPowerup).toUTCString()}
   `)
+    displayAd(ctx)
   } else {
     await ctx.reply(JSON.stringify(powerupResult))
   }
@@ -146,4 +147,13 @@ if (require.main === module) {
   console.log('Starting Telegram Bot');
   init(...process.argv).catch(console.error)
     .then((result) => console.log('Finished'))
+}
+
+
+async function displayAd(ctx: Context) {
+  return ctx.replyWithPhoto({ source: readFileSync('../images/efx-hackathon.jpg') }, {
+    caption: `<strong>Join now and build a dApp on Effect Network-the decentralized gateway to the world's talent.</strong>
+    <a href="https://effect-network-hackathon.devpost.com/">Join Hackathon</a>
+    `, parse_mode: "HTML"
+  })
 }

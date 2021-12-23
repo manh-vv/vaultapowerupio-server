@@ -22,19 +22,22 @@ async function init() {
     console.log('accounts:', result.length);
     console.log('Checking for small balances...');
     for (const account of shuffle(result)) {
-      const balance = (await getFullTable({ contract: env.contractAccount, tableName: Name.from('account'), scope: account }))[0].balance
-      console.log(balance);
+      try {
+        const balance = (await getFullTable({ contract: env.contractAccount, tableName: Name.from('account'), scope: account }))[0].balance
+        console.log(balance);
 
-      if (parseFloat(balance) < 0.035) {
-        console.log(account, balance);
-        const result = await doAction(Name.from('withdraw'), Withdraw.from({ owner: account, quantity: balance, receiver: account }), null, [PermissionLevel.from("eospowerupio@powerup")], [env.keys[1]])
-        console.log(result);
+        if (parseFloat(balance) < 0.035) {
+          console.log(account, balance);
+          const result = await doAction(Name.from('withdraw'), Withdraw.from({ owner: account, quantity: balance, receiver: account }), null, [PermissionLevel.from("eospowerupio@powerup")], [env.keys[1]])
+          console.log(result);
+        }
+      } catch (error) {
+        console.error(error);
       }
     }
   } catch (error) {
     console.error(error);
   }
-
 }
 init().catch(err => console.log(err.toString()))
 setInterval(init, ms('1h'))
