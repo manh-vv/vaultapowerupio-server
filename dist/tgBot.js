@@ -50,7 +50,6 @@ async function init(...inputs) {
             const listener = bot.hears(RegExp('[\s\S]*'), async (ctx) => {
                 await triggerPowerUp(ctx, env_1.default.contractAccount.toString(), ctx.message.text);
                 await showMainMenu(ctx);
-                listener.stop();
             });
         }).catch(err => console.error(err.toString()));
         bot.launch();
