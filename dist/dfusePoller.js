@@ -12,6 +12,8 @@ const queries = {
     logpowerup: { search: `action:logpowerup notif:false receiver:${env_1.default.contractAccount.toString()}`, table: 'logpowerup' },
     logbuyram: { search: `action:logbuyram notif:false receiver:${env_1.default.contractAccount.toString()}`, table: 'logbuyram' },
     transfer: { search: `account:eosio.token action:transfer receiver:${env_1.default.contractAccount.toString()} -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee`, table: 'transfer' },
+    pomelo: { search: `account:eosio.token action:transfer receiver:app.pomelo data.to:app.pomelo -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee`, table: 'transfer' },
+    pomeloClaim: { search: `account:eosio.token action:transfer receiver:claim.pomelo data.to:animus.inc -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee`, table: 'transfer' },
     regminer: { search: `account:gravyhftdefi action:regminer receiver:gravyhftdefi`, table: 'blacklist' },
     grvmine: { search: `account:gravyhftdefi action:mine`, table: 'blacklist' }
 };
@@ -35,10 +37,11 @@ function parseActions(action) {
     return parsedActions;
 }
 async function runQuery(dfuseQuery, cursor, low, table, query) {
-    return new Promise((res) => {
+    return new Promise((res, err) => {
         dfuse_1.default.graphql(dfuseQuery, async (message, stream) => {
             if (message.type === "error") {
                 console.error("An error occurred", message.errors, message.terminal);
+                err();
             }
             else if (message.type === "data") {
                 const results = message.data.searchTransactionsForward.results;
@@ -185,32 +188,33 @@ async function init(name, filter, replay) {
     }
     catch (error) {
         console.error("INIT ERROR:", error);
+        cleanExit();
     }
 }
 if (process.argv[2] && require.main === module) {
-    if (Object.keys(queries).find(el => el === process.argv[2])) {
-        console.log("Starting:", process.argv[2]);
-        let filter = process.argv[3];
-        let block = Number(process.argv[4]) || null;
+    start();
+}
+else
+    process.exit();
+async function start(params = process.argv) {
+    if (Object.keys(queries).find(el => el === params[2])) {
+        console.log("Starting:", params[2]);
+        let filter = params[3];
+        let block = Number(params[4]) || null;
         if (Number(filter)) {
             block = Number(filter);
             filter = "";
         }
-        init(process.argv[2], filter, block).finally(async () => {
-            await sleep(ms_1.default('60s'));
-            if (!block)
-                setTimeout(() => { cleanExit(); }, ms_1.default('10s'));
-            else
-                cleanExit();
+        init(params[2], filter, block).finally(async () => {
+            await sleep(ms_1.default('10s'));
+            start(["", "", process.argv[2], filter]);
         });
     }
     else {
         console.error("Erorr: invalid query");
-        process.exit();
+        cleanExit();
     }
 }
-else
-    process.exit();
 async function cleanExit() {
     console.log('Starting clean exit');
     await db_1.default.$disconnect();
