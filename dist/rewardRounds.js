@@ -13,9 +13,19 @@ console.log('using contract:', contract);
 async function claimAll() {
     const allClaimed = await eosio_1.getFullTable({ tableName: 'claimed', contract, type: nftTypes_1.Claimed });
     const unclaimed = allClaimed.filter(el => el.bronze_unclaimed.toNumber() > 0);
+    console.log('found', unclaimed.length, 'unclaimed');
     for (const row of unclaimed) {
+        console.log('claiming for', row.account.toString());
         let data = nftTypes_1.Claim.from({ donator: row.account });
-        await eosio_1.doAction('claim', data, contract);
+        const result = await eosio_1.doAction('claim', data, contract).catch(console.error);
+        if (!result)
+            console.error('claim erorr');
+        else if (result.receipts.length == 0)
+            console.error('claim erorr:', result.errors);
+        if (result) {
+            console.log(result.receipts[0].url.toString());
+            console.log(result.receipts[0].receipt.id);
+        }
     }
 }
 async function init() {
@@ -24,7 +34,13 @@ async function init() {
         const unrewarded = rounds.filter(el => el.rewarded == false);
         for (const round of unrewarded) {
             const data = nftTypes_1.Rewardround.from({ round_id: round.id });
-            await eosio_1.doAction('rewardround', data, contract);
+            const result = await eosio_1.doAction('rewardround', data, contract).catch(console.error);
+            if (!result)
+                return console.error('rewardround erorr');
+            if (result.receipts.length == 0)
+                console.error('rewardround erorr:', result.errors);
+            console.log(result.receipts[0].url.toString());
+            console.log(result.receipts[0].receipt.id);
         }
         await claimAll();
     }
