@@ -5,6 +5,7 @@ import { Name, PrivateKey, } from '@greymass/eosio'
 
 type chains = 'eos' | 'kylin' | 'jungle'
 interface eosioConfig {
+  chain: string
   keys: PrivateKey[]
   endpoints: URL[]
   workerAccount: Name
@@ -26,6 +27,7 @@ if (useChain) useChain = useChain.toLowerCase()
 if (!useChain) useChain = readEnv.default
 const untyped = readEnv.chain[useChain]
 const typed: eosioConfig = {
+  chain: useChain,
   contractAccount: Name.from(untyped.contractAccount),
   endpoints: untyped.endpoints.map(el => new URL(el)),
   keys: untyped.keys.map(el => PrivateKey.from(el)),

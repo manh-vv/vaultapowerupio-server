@@ -1,5 +1,6 @@
 import { Name, PrivateKey } from '@greymass/eosio';
 interface eosioConfig {
+    chain: string;
     keys: PrivateKey[];
     endpoints: URL[];
     workerAccount: Name;

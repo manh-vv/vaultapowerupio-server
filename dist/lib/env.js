@@ -11,6 +11,7 @@ if (!useChain)
     useChain = readEnv.default;
 const untyped = readEnv.chain[useChain];
 const typed = {
+    chain: useChain,
     contractAccount: eosio_1.Name.from(untyped.contractAccount),
     endpoints: untyped.endpoints.map(el => new URL(el)),
     keys: untyped.keys.map(el => eosio_1.PrivateKey.from(el)),

@@ -44,9 +44,9 @@ export declare function getAllScopes(params: API.v1.GetTableByScopeParams): Prom
 export declare function getFullTable(params: GetTableParams): Promise<any[]>;
 export declare function getInfo(): Promise<any>;
 export declare function getAccount(name: Name): Promise<API.v1.AccountObject>;
-export declare function doAction(name: Name | string, data?: {
+export declare function doAction(name: NameType, data?: {
     [key: string]: any;
-} | null, contract?: Name, authorization?: PermissionLevel[], keys?: PrivateKey[], retry?: number): Promise<DoActionResponse | null>;
+} | null, contract?: NameType, authorization?: PermissionLevel[], keys?: PrivateKey[], retry?: number): Promise<DoActionResponse | null>;
 export declare function pickRpc(): typeof rpcs[0];
 export declare function pickEndpoint(): string;
 export {};

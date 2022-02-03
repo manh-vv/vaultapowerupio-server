@@ -163,9 +163,8 @@ async function getAccount(name) {
 }
 exports.getAccount = getAccount;
 async function doAction(name, data, contract, authorization, keys, retry) {
-    if (typeof name == String())
-        if (!data)
-            data = {};
+    if (!data)
+        data = {};
     if (!contract)
         contract = eosio_1.Name.from(env_1.default.contractAccount);
     if (!authorization)

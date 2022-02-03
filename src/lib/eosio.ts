@@ -176,9 +176,9 @@ export async function getAccount(name: Name): Promise<API.v1.AccountObject> {
   const result = (await safeDo('get_account', name)) as API.v1.AccountObject
   return result
 }
-export async function doAction(name: Name | string, data?: { [key: string]: any } | null, contract?: Name, authorization?: PermissionLevel[], keys?: PrivateKey[], retry?: number): Promise<DoActionResponse | null> {
-  if (typeof name == String())
-    if (!data) data = {}
+export async function doAction(name: NameType, data?: { [key: string]: any } | null, contract?: NameType, authorization?: PermissionLevel[], keys?: PrivateKey[], retry?: number): Promise<DoActionResponse | null> {
+  // if (typeof name == String())
+  if (!data) data = {}
   if (!contract) contract = Name.from(env.contractAccount)
   if (!authorization) authorization = [PermissionLevel.from({ actor: env.workerAccount, permission: env.workerPermission })]
   // const signedTx:SignedTransaction = await rpc.push_transaction({})
