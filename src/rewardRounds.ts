@@ -64,3 +64,4 @@ async function init() {
 }
 
 init()
+setInterval(init, ms('1hr'))

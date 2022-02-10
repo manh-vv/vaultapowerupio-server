@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const env_1 = __importDefault(require("./lib/env"));
 const eosio_1 = require("./lib/eosio");
+const ms_1 = __importDefault(require("ms"));
 const nftTypes_1 = require("./lib/types/nftTypes");
 let contract = 'pwrupnfts';
 if (env_1.default.chain == 'eos')
@@ -67,4 +68,5 @@ async function init() {
     }
 }
 init();
+setInterval(init, ms_1.default('1hr'));
 //# sourceMappingURL=rewardRounds.js.map
