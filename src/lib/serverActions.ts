@@ -1,11 +1,12 @@
 import { Asset, Name, NameType, PermissionLevel } from '@greymass/eosio'
-import { doAction, getResouceCosts, ResourceCosts } from './eosio'
+import { doAction, getFullTable, getResouceCosts, ResourceCosts } from './eosio'
 import { Autopowerup, Dopowerup as DoPowerUp, Logpowerup } from './types/eospowerupio.types'
 import { Dopowerup } from '@prisma/client'
 import * as res from '@greymass/eosio-resources'
 import db from './db'
 import env from './env'
 import ms from 'ms'
+import * as nft from './types/nftTypes'
 
 export let resourcesCosts: ResourceCosts
 
@@ -53,6 +54,37 @@ async function checkBlacklist(account: NameType) {
   return result
 }
 
+let nftConfig: nft.NftConfig
+
+export async function loadNftConfig(): Promise<nft.NftConfig> {
+  if (!nftConfig) {
+    const config: nft.Config = nft.Config.from((await getFullTable({ tableName: 'config', contract: env.nftContract, type: nft.Config }))[0])
+    nftConfig = config.nft
+    return nftConfig
+  } else return nftConfig
+}
+// let cachedStakes: Record<string, nft.Staked[]>
+export async function loadAccountStakes(account: NameType): Promise<nft.Staked[]> {
+  try {
+    const accountStaked: nft.Staked[] = await getFullTable({ tableName: "staked", contract: env.nftContract, scope: account, type: nft.Staked })
+    return accountStaked
+  } catch (error) {
+    console.error("loadAccountStakes error:", error)
+    return []
+  }
+}
+
+export async function hasBronzeStake(account: NameType): Promise<boolean> {
+  try {
+    const config = await loadNftConfig()
+    const accountStaked = await loadAccountStakes(account)
+    const exists = accountStaked.find((el) => el.template_id.equals(config.bronze_template_id))
+    return exists ? true : false
+  } catch (error) {
+    return false
+  }
+}
+
 export async function freePowerup(accountName: string | Name, params?: any): Promise<FreePowerupResult> {
   if (typeof accountName == 'string') accountName = Name.from(accountName)
   const blacklisted = await checkBlacklist(accountName)
@@ -63,7 +95,10 @@ export async function freePowerup(accountName: string | Name, params?: any): Pro
   })
   console.log('recent Powerups', recentPowerups.length);
   if (recentPowerups.length < freeDailyQuota) {
-    const result = await doPowerup(env.contractAccount, accountName, 3, 20)
+    const bonusSize = await hasBronzeStake(accountName)
+    const cpu = bonusSize ? 6 : 3
+    const net = bonusSize ? 40 : 20
+    const result = await doPowerup(env.contractAccount, accountName, cpu, net)
     // console.log('DoPowerup Result:', result)
     if (result?.receipts.length > 0) {
       const powerupData = DoPowerUp.from(result.receipts[0].receipt.action_traces[0].act.data)

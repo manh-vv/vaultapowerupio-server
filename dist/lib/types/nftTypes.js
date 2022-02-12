@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Simdonation = exports.Setconfig = exports.Rmaccount = exports.Rewardround = exports.Rewardlog = exports.RewardsData = exports.Rounds = exports.Leaderboard = exports.Config = exports.NftConfig = exports.Clrrounds = exports.Clrround = exports.Clrleaderb = exports.Clrconfig = exports.Clrclaimed = exports.Clrbalances = exports.Claimed = exports.Claim = exports.Balances = void 0;
+exports.Unstake = exports.Staked = exports.Simdonation = exports.Setconfig = exports.Rmaccount = exports.Rewardround = exports.Rewardlog = exports.RewardsData = exports.Rounds = exports.Leaderboard = exports.Config = exports.NftConfig = exports.Clrrounds = exports.Clrround = exports.Clrleaderb = exports.Clrconfig = exports.Clrclaimed = exports.Clrbalances = exports.Claimed = exports.Claim = exports.Balances = void 0;
 const eosio_1 = require("@greymass/eosio");
 let Balances = class Balances extends eosio_1.Struct {
 };
@@ -345,4 +345,36 @@ Simdonation = __decorate([
     eosio_1.Struct.type('simdonation')
 ], Simdonation);
 exports.Simdonation = Simdonation;
+let Staked = class Staked extends eosio_1.Struct {
+};
+__decorate([
+    eosio_1.Struct.field(eosio_1.UInt32),
+    __metadata("design:type", eosio_1.UInt32)
+], Staked.prototype, "template_id", void 0);
+__decorate([
+    eosio_1.Struct.field(eosio_1.UInt64),
+    __metadata("design:type", eosio_1.UInt64)
+], Staked.prototype, "asset_id", void 0);
+__decorate([
+    eosio_1.Struct.field(eosio_1.TimePointSec),
+    __metadata("design:type", eosio_1.TimePointSec)
+], Staked.prototype, "locked_until", void 0);
+Staked = __decorate([
+    eosio_1.Struct.type('staked')
+], Staked);
+exports.Staked = Staked;
+let Unstake = class Unstake extends eosio_1.Struct {
+};
+__decorate([
+    eosio_1.Struct.field(eosio_1.Name),
+    __metadata("design:type", eosio_1.Name)
+], Unstake.prototype, "owner", void 0);
+__decorate([
+    eosio_1.Struct.field(eosio_1.UInt32),
+    __metadata("design:type", eosio_1.UInt32)
+], Unstake.prototype, "template_id", void 0);
+Unstake = __decorate([
+    eosio_1.Struct.type('unstake')
+], Unstake);
+exports.Unstake = Unstake;
 //# sourceMappingURL=nftTypes.js.map

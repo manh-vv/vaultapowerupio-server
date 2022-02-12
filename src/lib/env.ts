@@ -11,6 +11,7 @@ interface eosioConfig {
   workerAccount: Name
   workerPermission: Name
   contractAccount: Name
+  nftContract?: Name
   telegramKey?: string
   discordKey?: string
 }
@@ -35,6 +36,7 @@ const typed: eosioConfig = {
   workerPermission: Name.from(untyped.workerPermission),
   telegramKey: untyped?.telegramKey,
   discordKey: untyped?.discordKey,
+  nftContract: untyped?.nftContract
 }
 const config: eosioConfig = typed
 export default config

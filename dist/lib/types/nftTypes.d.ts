@@ -92,3 +92,12 @@ export declare class Simdonation extends Struct {
     donator: Name;
     donation: Asset;
 }
+export declare class Staked extends Struct {
+    template_id: UInt32;
+    asset_id: UInt64;
+    locked_until: TimePointSec;
+}
+export declare class Unstake extends Struct {
+    owner: Name;
+    template_id: UInt32;
+}

@@ -1,15 +1,35 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStats = exports.freePowerup = exports.doAutoPowerup = exports.doPowerup = exports.resourcesCosts = void 0;
+exports.getStats = exports.freePowerup = exports.hasBronzeStake = exports.loadAccountStakes = exports.loadNftConfig = exports.doAutoPowerup = exports.doPowerup = exports.resourcesCosts = void 0;
 const eosio_1 = require("@greymass/eosio");
 const eosio_2 = require("./eosio");
 const eospowerupio_types_1 = require("./types/eospowerupio.types");
 const db_1 = __importDefault(require("./db"));
 const env_1 = __importDefault(require("./env"));
 const ms_1 = __importDefault(require("ms"));
+const nft = __importStar(require("./types/nftTypes"));
 const freeDailyQuota = 2;
 setInterval(updateResourceCosts, ms_1.default('5 minutes'));
 updateResourceCosts();
@@ -42,6 +62,40 @@ async function checkBlacklist(account) {
     const result = await db_1.default.blacklist.findUnique({ where: { account: account.toString() } });
     return result;
 }
+let nftConfig;
+async function loadNftConfig() {
+    if (!nftConfig) {
+        const config = nft.Config.from((await eosio_2.getFullTable({ tableName: 'config', contract: env_1.default.nftContract, type: nft.Config }))[0]);
+        nftConfig = config.nft;
+        return nftConfig;
+    }
+    else
+        return nftConfig;
+}
+exports.loadNftConfig = loadNftConfig;
+async function loadAccountStakes(account) {
+    try {
+        const accountStaked = await eosio_2.getFullTable({ tableName: "staked", contract: env_1.default.nftContract, scope: account, type: nft.Staked });
+        return accountStaked;
+    }
+    catch (error) {
+        console.error("loadAccountStakes error:", error);
+        return [];
+    }
+}
+exports.loadAccountStakes = loadAccountStakes;
+async function hasBronzeStake(account) {
+    try {
+        const config = await loadNftConfig();
+        const accountStaked = await loadAccountStakes(account);
+        const exists = accountStaked.find((el) => el.template_id.equals(config.bronze_template_id));
+        return exists ? true : false;
+    }
+    catch (error) {
+        return false;
+    }
+}
+exports.hasBronzeStake = hasBronzeStake;
 async function freePowerup(accountName, params) {
     if (typeof accountName == 'string')
         accountName = eosio_1.Name.from(accountName);
@@ -54,7 +108,10 @@ async function freePowerup(accountName, params) {
     });
     console.log('recent Powerups', recentPowerups.length);
     if (recentPowerups.length < freeDailyQuota) {
-        const result = await doPowerup(env_1.default.contractAccount, accountName, 3, 20);
+        const bonusSize = await hasBronzeStake(accountName);
+        const cpu = bonusSize ? 6 : 3;
+        const net = bonusSize ? 40 : 20;
+        const result = await doPowerup(env_1.default.contractAccount, accountName, cpu, net);
         if (result?.receipts.length > 0) {
             const powerupData = eospowerupio_types_1.Dopowerup.from(result.receipts[0].receipt.action_traces[0].act.data);
             const logPowerUpData = eospowerupio_types_1.Logpowerup.from(result.receipts[0].receipt.action_traces[0].inline_traces[1].inline_traces[0].act.data);

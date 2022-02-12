@@ -65,6 +65,7 @@ async function init() {
     }
     catch (error) {
         console.error('top level error:', error);
+        process.exit();
     }
 }
 init();

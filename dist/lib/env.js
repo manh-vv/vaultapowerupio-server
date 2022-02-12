@@ -19,6 +19,7 @@ const typed = {
     workerPermission: eosio_1.Name.from(untyped.workerPermission),
     telegramKey: untyped?.telegramKey,
     discordKey: untyped?.discordKey,
+    nftContract: untyped?.nftContract
 };
 const config = typed;
 exports.default = config;

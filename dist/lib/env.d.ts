@@ -6,6 +6,7 @@ interface eosioConfig {
     workerAccount: Name;
     workerPermission: Name;
     contractAccount: Name;
+    nftContract?: Name;
     telegramKey?: string;
     discordKey?: string;
 }
