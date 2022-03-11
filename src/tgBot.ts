@@ -34,31 +34,7 @@ export default async function init(...inputs: any) {
     //   registerUser(ctx)
     // }).catch(err => console.error(err.toString()))
 
-    bot.hears('Free PowerUp', async (ctx) => {
-      const userid = await registerUser(ctx)
-      const tgQuota = await checkQuota(userid)
-      if (tgQuota.error) {
-        await ctx.reply(tgQuota.error)
-        await showMainMenu(ctx)
-      } else if (tgQuota.nextPowerup) {
-        await ctx.replyWithHTML(`
-        <strong>Free PowerUp Error:</strong>
-        ❌ Free PowerUp Quota reached for this account.
-        ⏲️ Next free PowerUp available:
-        ${timeAgo.format(new Date(tgQuota.nextPowerup))}
-        `)
-        await displayAd(ctx)
-        return showMainMenu(ctx)
-      } else {
-        await ctx.reply(`You have ${tgQuota.quotaAvailable} of ${freeDailyQuota} free PowerUps available today.`)
-      }
-      await ctx.reply('Enter the name of the EOS account to PowerUp')
-      const listener = bot.hears(RegExp('[\s\S]*'), async ctx => {
-        await triggerPowerUp(ctx, env.contractAccount.toString(), ctx.message.text)
-        await showMainMenu(ctx)
-        // listener.stop()
-      })
-    }).catch(err => console.error(err.toString()))
+    bot.hears('Free PowerUp', (ctx) => handleFreePowerUp(ctx)).catch(err => console.error(err.toString()))
 
     bot.launch()
     process.once('SIGINT', () => bot.stop('SIGINT'))
@@ -67,7 +43,23 @@ export default async function init(...inputs: any) {
     console.error(error.toString())
   }
 }
-
+async function handleFreePowerUp(ctx: Context) {
+  {
+    if (!(await checkUserQuota(ctx))) return
+    await ctx.reply('Enter the name of the EOS account to PowerUp')
+    let listener = bot.hears(RegExp('[\s\S]*'), async ctx => {
+      try {
+        if (!(await checkUserQuota(ctx))) return
+        await triggerPowerUp(ctx, env.contractAccount.toString(), ctx.message.text)
+        // bot.hears('Free PowerUp', (ctx) => handleFreePowerUp(ctx)).catch(err => console.error(err.toString()))
+        showMainMenu(ctx)
+        // listener.stop()
+      } catch (error) {
+        console.error(error)
+      }
+    })
+  }
+}
 async function registerUser(ctx: Context): Promise<string> {
   try {
     'Checking User Registration...'
@@ -85,6 +77,28 @@ async function registerUser(ctx: Context): Promise<string> {
     console.log(error.toString())
     ctx.reply('Error: ' + error.toString())
     return null
+  }
+}
+async function checkUserQuota(ctx: Context): Promise<boolean> {
+  const userid = await registerUser(ctx)
+  const tgQuota = await checkQuota(userid)
+  if (tgQuota.error) {
+    await ctx.reply(tgQuota.error)
+    showMainMenu(ctx)
+    return false
+  } else if (tgQuota.nextPowerup) {
+    await ctx.replyWithHTML(`
+    <strong>Free PowerUp Error:</strong>
+    ❌ Free PowerUp Quota reached for this account.
+    ⏲️ Next free PowerUp available:
+    ${timeAgo.format(new Date(tgQuota.nextPowerup))}
+    `)
+    await displayAd(ctx)
+    showMainMenu(ctx)
+    return false
+  } else {
+    ctx.reply(`You have ${tgQuota.quotaAvailable} of ${freeDailyQuota} free PowerUps available today.`)
+    return true
   }
 }
 
@@ -115,7 +129,7 @@ async function triggerPowerUp(ctx: Context, payer: string, name: string) {
     await bot.telegram.editMessageText(ctx.chat.id, statusMsg.message_id, null, 'Powering Up' + dots.join(''))
     if (dots.length == 5) dots = []
   }
-  await bot.telegram.deleteMessage(ctx.chat.id, statusMsg.message_id).catch(err => console.error(err.toString()))
+  // await bot.telegram.deleteMessage(ctx.chat.id, statusMsg.message_id).catch(err => console.error(err.toString()))
   if (!powerupResult.status || powerupResult.status == 'error') {
     ctx.replyWithHTML(`
     <strong>${name} Free PowerUp Error:</strong>
@@ -161,3 +175,5 @@ async function displayAd(ctx: Context) {
   // ctx.reply("🚨 Donate at least 1 EOS to be included in the PowerUp NFT appreciation drop.")
   // ctx.reply("🎄 Happy Holidays from EOS PowerUp!")
 }
+
+//PowerUp Bronze NFT staking is now live! You can stake your Bronze NFT to receive additional CPU when claiming free PowerUps. Visit eospowerup.io/nft/activate for details.

@@ -36,6 +36,11 @@ const express_blacklist_1 = __importDefault(require("express-blacklist"));
 app.use(express_blacklist_1.default.blockRequests('../blacklist.txt'));
 const express_cache_middleware_1 = __importDefault(require("express-cache-middleware"));
 const cache_manager_1 = __importDefault(require("cache-manager"));
+function toObject(data) {
+    return JSON.parse(JSON.stringify(data, (key, value) => typeof value === 'bigint'
+        ? parseInt(value.toString())
+        : value));
+}
 const limiter = express_rate_limit_1.default({
     windowMs: ms_1.default('24h'),
     max: 4
@@ -94,7 +99,7 @@ app.use('/freePowerup/:accountName', limiter, async (req, res) => {
             res.statusCode = 400;
         }
         console.log(result);
-        res.json({ result, rateLimit: req.rateLimit });
+        res.json({ result: toObject(result), rateLimit: req.rateLimit });
     }
     catch (error) {
         res.statusCode = 500;
@@ -107,7 +112,7 @@ cacheMiddleware.attach(app);
 app.use('/stats', limiter2, async (req, res) => {
     try {
         const result = await serverActions.getStats();
-        res.json(result);
+        res.json(toObject(result));
     }
     catch (error) {
         res.statusCode = 500;

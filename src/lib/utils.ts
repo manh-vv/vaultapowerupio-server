@@ -67,7 +67,8 @@ export async function checkQuota(userid: string): Promise<QuotaResult> {
       console.log('found recent tg User powerups');
       const oldest = recentPowerups[recentPowerups.length - 1]
       console.log(oldest);
-      const elapsed = Date.now() - oldest.time
+      // const elapsed = Date.now() - parseInt(oldest.time.toString())
+      const elapsed = parseInt((BigInt(Date.now()) - oldest.time).toString())
       console.log('elapsed', elapsed);
       const timeLeft = ms('24h') - elapsed
       const nextPowerup = Date.now() + timeLeft

@@ -103,7 +103,12 @@ async function freePowerup(accountName, params) {
     if (blacklisted)
         return { status: 'blacklisted', errors: [{ blacklisted: blacklisted.reason }] };
     const recentPowerups = await db_1.default.dopowerup.findMany({
-        where: { receiver: accountName.toString(), payer: env_1.default.contractAccount.toString(), time: { gte: Date.now() - ms_1.default('24hr') }, failed: { not: true } },
+        where: {
+            receiver: accountName.toString(),
+            payer: env_1.default.contractAccount.toString(),
+            time: { gte: Date.now() - ms_1.default('24hr') },
+            failed: { not: true }
+        },
         orderBy: { time: 'desc' },
     });
     console.log('recent Powerups', recentPowerups.length);
@@ -133,7 +138,7 @@ async function freePowerup(accountName, params) {
     }
     else {
         const oldest = recentPowerups[recentPowerups.length - 1];
-        const elapsed = Date.now() - oldest.time;
+        const elapsed = Date.now() - parseInt(oldest.time.toString());
         const timeLeft = ms_1.default('24h') - elapsed;
         const nextPowerup = Date.now() + timeLeft;
         return { status: 'reachedFreeQuota', nextPowerup, recentPowerups };
@@ -144,6 +149,8 @@ async function getStats() {
     let stats = await db_1.default.stats.findFirst({
         take: 1, orderBy: { createdAt: 'desc' }
     });
+    console.log(stats);
+    stats.createdAt;
     try {
         stats.rpcErrorStats = JSON.parse(stats.rpcErrorStats);
     }

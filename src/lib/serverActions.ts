@@ -8,6 +8,7 @@ import env from './env'
 import ms from 'ms'
 import * as nft from './types/nftTypes'
 
+
 export let resourcesCosts: ResourceCosts
 
 const freeDailyQuota = 2
@@ -90,7 +91,12 @@ export async function freePowerup(accountName: string | Name, params?: any): Pro
   const blacklisted = await checkBlacklist(accountName)
   if (blacklisted) return { status: 'blacklisted', errors: [{ blacklisted: blacklisted.reason }] }
   const recentPowerups = await db.dopowerup.findMany({
-    where: { receiver: accountName.toString(), payer: env.contractAccount.toString(), time: { gte: Date.now() - ms('24hr') }, failed: { not: true } },
+    where: {
+      receiver: accountName.toString(),
+      payer: env.contractAccount.toString(),
+      time: { gte: Date.now() - ms('24hr') },
+      failed: { not: true }
+    },
     orderBy: { time: 'desc' },
   })
   console.log('recent Powerups', recentPowerups.length);
@@ -124,7 +130,7 @@ export async function freePowerup(accountName: string | Name, params?: any): Pro
     // console.log('found recent powerups');
     const oldest = recentPowerups[recentPowerups.length - 1]
     // console.log(oldest);
-    const elapsed = Date.now() - oldest.time
+    const elapsed = Date.now() - parseInt(oldest.time.toString())
     // console.log('elapsed', elapsed);
     const timeLeft = ms('24h') - elapsed
     const nextPowerup = Date.now() + timeLeft
@@ -138,6 +144,9 @@ export async function getStats() {
   let stats = await db.stats.findFirst({
     take: 1, orderBy: { createdAt: 'desc' }
   })
+  console.log(stats);
+  stats.createdAt
+
   try {
     stats.rpcErrorStats = JSON.parse(stats.rpcErrorStats)
   } catch (error) {

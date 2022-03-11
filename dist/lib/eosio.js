@@ -19,7 +19,7 @@ function rand(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 const eosio_resources_1 = require("@greymass/eosio-resources");
-function errorCounter(endpoint, error) {
+async function errorCounter(endpoint, error) {
     console.log('writing error:', endpoint, error);
     db_1.default.rpcErrors.create({ data: { endpoint, error, time: Date.now() } }).catch(console.error);
 }

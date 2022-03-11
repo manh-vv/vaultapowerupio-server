@@ -33,7 +33,7 @@ async function updateStats(data) {
                     const result = await eosio_1.getFullTable({ tableName: eosio_2.Name.from("watchlist"), contract: env_1.default.contractAccount, scope: owner, type: eospowerupio_types_1.WatchlistRow });
                     totalWatched += result.length;
                     res(null);
-                }, 841 * i);
+                }, 1410 * i);
                 i++;
             }));
             getResults.push(new Promise(async (res, rej) => {
@@ -41,7 +41,7 @@ async function updateStats(data) {
                     const result = await eosio_1.getFullTable({ tableName: eosio_2.Name.from("account"), contract: env_1.default.contractAccount, scope: owner, type: eospowerupio_types_1.AccountRow });
                     totalDeposited += parseFloat(result[0]?.balance) || 0;
                     res(null);
-                }, 500 * i2);
+                }, 1000 * i2);
                 i2++;
             }));
         });

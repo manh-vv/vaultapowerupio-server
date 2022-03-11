@@ -1,9 +1,28 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const dfuse_1 = __importDefault(require("./lib/dfuse"));
+const dfuse = __importStar(require("./lib/dfuse"));
 const ms_1 = __importDefault(require("ms"));
 const db_1 = __importDefault(require("./lib/db"));
 const env_1 = __importDefault(require("./lib/env"));
@@ -12,11 +31,13 @@ const queries = {
     logpowerup: { search: `action:logpowerup notif:false receiver:${env_1.default.contractAccount.toString()}`, table: 'logpowerup' },
     logbuyram: { search: `action:logbuyram notif:false receiver:${env_1.default.contractAccount.toString()}`, table: 'logbuyram' },
     transfer: { search: `account:eosio.token action:transfer receiver:${env_1.default.contractAccount.toString()} -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee`, table: 'transfer' },
+    donate: { search: `account:eosio.token action:transfer receiver:powerup.nfts -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee`, table: 'transfer' },
     pomelo: { search: `account:eosio.token action:transfer receiver:app.pomelo data.to:app.pomelo -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee`, table: 'transfer' },
     pomeloClaim: { search: `account:eosio.token action:transfer receiver:claim.pomelo data.to:animus.inc -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee`, table: 'transfer' },
     regminer: { search: `account:gravyhftdefi action:regminer receiver:gravyhftdefi`, table: 'blacklist' },
     grvmine: { search: `account:gravyhftdefi action:mine`, table: 'blacklist' }
 };
+let currentClient = 'client1';
 function parseActions(action) {
     const data = action;
     const trace = data.trace;
@@ -38,7 +59,7 @@ function parseActions(action) {
 }
 async function runQuery(dfuseQuery, cursor, low, table, query) {
     return new Promise((res, err) => {
-        dfuse_1.default.graphql(dfuseQuery, async (message, stream) => {
+        dfuse[currentClient].graphql(dfuseQuery, async (message, stream) => {
             if (message.type === "error") {
                 console.error("An error occurred", message.errors, message.terminal);
                 err();
@@ -56,11 +77,26 @@ async function runQuery(dfuseQuery, cursor, low, table, query) {
                 stream.close();
                 res();
             }
-        }, { variables: { cursor, low, limit: 100 } })
+        }, { variables: { cursor, low, limit: 20 } })
             .catch(async (error) => {
             console.error('dfuse gql error:', error);
-            await sleep(ms_1.default('30s'));
-            cleanExit();
+            if (error?.message == 'blocked: document quota exceeded') {
+                console.log(currentClient, 'changing client');
+                if (currentClient == 'client1')
+                    currentClient = 'client2';
+                else if (currentClient == 'client2')
+                    currentClient = 'client3';
+                else if (currentClient == 'client3')
+                    currentClient = 'client4';
+                else
+                    currentClient = 'client1';
+                await sleep(ms_1.default('30s'));
+                res();
+            }
+            else {
+                await sleep(ms_1.default('30s'));
+                cleanExit();
+            }
         });
     });
 }
@@ -84,7 +120,6 @@ async function saveAction({ action, cursor, table, searchString }) {
                 },
                 update: {}
             });
-            console.log('Wrote logpowerup:', result);
         }
         else if (table === 'logbuyram') {
             const result = await db_1.default.logbuyram.upsert({
@@ -136,7 +171,7 @@ async function saveAction({ action, cursor, table, searchString }) {
             create: { searchString, cursor, lowBlock: action.block.num },
             update: { cursor, lowBlock: action.block.num }
         });
-        console.log('Wrote Cursor:', result);
+        console.log(currentClient, 'Wrote Cursor:', result);
     }
     catch (error) {
         console.error('saveAction Error:', error);
@@ -174,7 +209,7 @@ async function init(name, filter, replay) {
             if (!lastCursor)
                 throw ("query does not have a previous cursor, start with replay first.");
             console.log('lst cursor', lastCursor);
-            low = lastCursor + 1;
+            low = parseInt(lastCursor.toString()) + 1;
         }
         console.log("Query:", query);
         const streamTransfer = `query($cursor: String, $low: Int64,$limit:Int64) {
@@ -206,7 +241,7 @@ async function start(params = process.argv) {
             filter = "";
         }
         init(params[2], filter, block).finally(async () => {
-            await sleep(ms_1.default('10s'));
+            await sleep(ms_1.default('5s'));
             start(["", "", process.argv[2], filter]);
         });
     }
@@ -218,7 +253,8 @@ async function start(params = process.argv) {
 async function cleanExit() {
     console.log('Starting clean exit');
     await db_1.default.$disconnect();
-    dfuse_1.default.release();
+    dfuse.client1.release();
+    dfuse.client2.release();
     process.kill(process.pid, 'SIGTERM');
 }
 //# sourceMappingURL=dfusePoller.js.map

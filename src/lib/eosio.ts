@@ -4,6 +4,7 @@ import ms from 'ms'
 import { shuffle } from './utils'
 import env from './env'
 import db from './db'
+
 let client: APIClient
 let provider: APIProvider
 export let rpcs: { endpoint: URL, rpc: typeof client.v1.chain }[]
@@ -45,10 +46,11 @@ interface GetTableParams {
   type?: any
 }
 
-function errorCounter(endpoint: string, error: string) {
+async function errorCounter(endpoint: string, error: string) {
   console.log('writing error:', endpoint, error);
-
+  // await db.$connect()
   db.rpcErrors.create({ data: { endpoint, error, time: Date.now() } }).catch(console.error)
+  // await db.$disconnect()
 }
 export interface ResourceCosts { cpuMsCost: number, netKbCost: number, msToFrac: number, kbToFrac: number }
 export async function getResouceCosts(retry?: number): Promise<ResourceCosts | null> {

@@ -15,6 +15,13 @@ app.use(blacklist.blockRequests('../blacklist.txt'));
 import ExpressCache from 'express-cache-middleware'
 import cacheManager from 'cache-manager'
 import { exit } from 'process'
+function toObject(data) {
+  return JSON.parse(JSON.stringify(data, (key, value) =>
+    typeof value === 'bigint'
+      ? parseInt(value.toString())
+      : value // return everything else unchanged
+  ));
+}
 
 const limiter = rateLimit({
   windowMs: ms('24h'),
@@ -53,7 +60,6 @@ app.use(async function (req, res, next) {
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
   const exit = () => {
     console.log('Blocking request From:', ip);
-
     res.statusCode = 403
     res.end()
     return
@@ -83,7 +89,7 @@ app.use('/freePowerup/:accountName', limiter, async (req, res) => {
       res.statusCode = 400
     }
     console.log(result)
-    res.json({ result, rateLimit: req.rateLimit })
+    res.json({ result: toObject(result), rateLimit: req.rateLimit })
   } catch (error) {
     res.statusCode = 500
     console.log(error)
@@ -97,7 +103,8 @@ app.use('/stats', limiter2, async (req, res) => {
   try {
     const result = await serverActions.getStats()
     // if (result?.error) throw ("Error")
-    res.json(result)
+    res.json(toObject(result))
+    // res.send(result)
   } catch (error) {
     res.statusCode = 500
     console.log(error)

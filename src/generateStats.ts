@@ -32,7 +32,7 @@ async function updateStats(data?: any) {
           const result = await getFullTable({ tableName: Name.from("watchlist"), contract: env.contractAccount, scope: owner, type: WatchlistRow }) as WatchlistRow[]
           totalWatched += result.length
           res(null)
-        }, 841 * i)
+        }, 1410 * i)
         i++
       }))
       getResults.push(new Promise(async (res, rej) => {
@@ -40,7 +40,7 @@ async function updateStats(data?: any) {
           const result = await getFullTable({ tableName: Name.from("account"), contract: env.contractAccount, scope: owner, type: AccountRow })
           totalDeposited += parseFloat(result[0]?.balance) || 0
           res(null)
-        }, 500 * i2)
+        }, 1000 * i2)
         i2++
       }))
     })

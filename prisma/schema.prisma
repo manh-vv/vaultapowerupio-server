@@ -1,68 +1,65 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
-}
-
 generator client {
   provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Dopowerup {
   txid       String  @id
   receiver   String
   payer      String
-  cpu_frac   Int
-  net_frac   Int
-  time       Int
+  cpu_frac   BigInt
+  net_frac   BigInt
+  time       BigInt
   failed     Boolean
   reversible Boolean
+  userId     String?
+  User       User?   @relation(fields: [userId], references: [id])
 
-  User   User?   @relation(fields: [userId], references: [id])
-  userId String?
-  @@index([time])
-  @@index([receiver])
-  @@index([payer])
+  @@index([payer], map: "Dopowerup.payer_index")
+  @@index([receiver], map: "Dopowerup.receiver_index")
+  @@index([time], map: "Dopowerup.time_index")
 }
 
 model User {
   id             String      @id @default(cuid())
-  telegramId     Int?        @unique
-  telegramHandle String?     @unique
-  eosAccount     String?     @unique
-  discordId      String?     @unique
+  telegramId     BigInt?     @unique(map: "User.telegramId_unique")
+  telegramHandle String?     @unique(map: "User.telegramHandle_unique")
+  eosAccount     String?     @unique(map: "User.eosAccount_unique")
+  discordId      String?     @unique(map: "User.discordId_unique")
   discordHandle  String?
+  email          String?     @unique(map: "User.email_unique")
   freePowerups   Dopowerup[]
-  email          String?     @unique
 }
 
 model Cursor {
   searchString String @id
   cursor       String
-  lowBlock     Int
+  lowBlock     BigInt
 
-  @@index([lowBlock])
-  @@index([searchString])
+  @@index([lowBlock], map: "Cursor.lowBlock_index")
+  @@index([searchString], map: "Cursor.searchString_index")
 }
 
 model ipblacklist {
   ip     String @id
   reason String
 
-  @@index([reason])
+  @@index([reason], map: "ipblacklist.reason_index")
 }
 
 model blacklist {
   account String @id
   reason  String
 
-  @@index([reason])
+  @@index([reason], map: "blacklist.reason_index")
 }
 
 model Logpowerup {
-  seq             Int    @id
+  seq             BigInt @id
   txid            String
   action          String
   cost            Float
@@ -72,18 +69,18 @@ model Logpowerup {
   receiver        String
   payer           String
   total_billed    Float
-  blockTime       Int
+  blockTime       BigInt
 
-  @@index([receiver])
-  @@index([payer])
-  @@index([action])
-  @@index([fee])
-  @@index([cost])
-  @@index([blockTime])
+  @@index([action], map: "Logpowerup.action_index")
+  @@index([blockTime], map: "Logpowerup.blockTime_index")
+  @@index([cost], map: "Logpowerup.cost_index")
+  @@index([fee], map: "Logpowerup.fee_index")
+  @@index([payer], map: "Logpowerup.payer_index")
+  @@index([receiver], map: "Logpowerup.receiver_index")
 }
 
 model Logbuyram {
-  seq             Int    @id
+  seq             BigInt @id
   txid            String
   action          String
   cost            Float
@@ -92,37 +89,37 @@ model Logbuyram {
   receiver        String
   payer           String
   total_billed    Float
-  blockTime       Int
+  blockTime       BigInt
 
-  @@index([receiver])
-  @@index([payer])
-  @@index([action])
-  @@index([fee])
-  @@index([cost])
-  @@index([blockTime])
+  @@index([action], map: "Logbuyram.action_index")
+  @@index([blockTime], map: "Logbuyram.blockTime_index")
+  @@index([cost], map: "Logbuyram.cost_index")
+  @@index([fee], map: "Logbuyram.fee_index")
+  @@index([payer], map: "Logbuyram.payer_index")
+  @@index([receiver], map: "Logbuyram.receiver_index")
 }
 
 model Transfer {
-  seq       Int    @id
+  seq       BigInt @id
   from      String
   to        String
   quantity  Float
   memo      String
   symbol    String
   txid      String
-  blockTime Int
+  blockTime BigInt
 
-  @@index([blockTime])
-  @@index([seq])
-  @@index([from])
-  @@index([to])
-  @@index([symbol])
+  @@index([blockTime], map: "Transfer.blockTime_index")
+  @@index([from], map: "Transfer.from_index")
+  @@index([seq], map: "Transfer.seq_index")
+  @@index([symbol], map: "Transfer.symbol_index")
+  @@index([to], map: "Transfer.to_index")
 }
 
 model Stats {
   id                   String @id @default(cuid())
-  owners               Int
-  totalWatched         Int
+  owners               BigInt
+  totalWatched         BigInt
   totalDeposited       Float
   internalEOSBal       Float  @default(0)
   eosBal               Float  @default(0)
@@ -137,30 +134,30 @@ model Stats {
   activeDiscordUsers   Int    @default(0)
   freePowerups24hr     Int    @default(0)
   freePowerupsCost24hr Float  @default(0)
-  createdAt            Int
+  createdAt            BigInt
   rpcErrorStats        String @default("")
 
-  @@index([createdAt])
+  @@index([createdAt], map: "Stats.createdAt_index")
 }
 
 model rpcErrors {
   id       String @id @default(cuid())
-  time     Int
+  time     BigInt
   endpoint String
   error    String
 
-  @@index([endpoint])
-  @@index([error])
-  @@index([time])
+  @@index([endpoint], map: "rpcErrors.endpoint_index")
+  @@index([error], map: "rpcErrors.error_index")
+  @@index([time], map: "rpcErrors.time_index")
 }
 
 model rpcSuccess {
   id       String @id @default(cuid())
-  time     Int
+  time     BigInt
   endpoint String
   error    String
 
-  @@index([endpoint])
-  @@index([error])
-  @@index([time])
+  @@index([endpoint], map: "rpcSuccess.endpoint_index")
+  @@index([error], map: "rpcSuccess.error_index")
+  @@index([time], map: "rpcSuccess.time_index")
 }
