@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require('dotenv').config();
 const fs_extra_1 = require("fs-extra");
 const eosio_1 = require("@greymass/eosio");
-const readEnv = fs_extra_1.readJSONSync('../.env.json');
+const readEnv = (0, fs_extra_1.readJSONSync)('../.env.json');
 let useChain = process.env.CHAIN;
 if (useChain)
     useChain = useChain.toLowerCase();
@@ -17,9 +17,9 @@ const typed = {
     keys: untyped.keys.map(el => eosio_1.PrivateKey.from(el)),
     workerAccount: eosio_1.Name.from(untyped.workerAccount),
     workerPermission: eosio_1.Name.from(untyped.workerPermission),
-    telegramKey: untyped?.telegramKey,
-    discordKey: untyped?.discordKey,
-    nftContract: untyped?.nftContract
+    telegramKey: untyped === null || untyped === void 0 ? void 0 : untyped.telegramKey,
+    discordKey: untyped === null || untyped === void 0 ? void 0 : untyped.discordKey,
+    nftContract: untyped === null || untyped === void 0 ? void 0 : untyped.nftContract
 };
 const config = typed;
 exports.default = config;

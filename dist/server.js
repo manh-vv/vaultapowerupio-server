@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -23,7 +27,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const app = express_1.default();
+const app = (0, express_1.default)();
 const ms_1 = __importDefault(require("ms"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 var cors = require('cors');
@@ -41,12 +45,12 @@ function toObject(data) {
         ? parseInt(value.toString())
         : value));
 }
-const limiter = express_rate_limit_1.default({
-    windowMs: ms_1.default('24h'),
+const limiter = (0, express_rate_limit_1.default)({
+    windowMs: (0, ms_1.default)('24h'),
     max: 4
 });
-const limiter2 = express_rate_limit_1.default({
-    windowMs: ms_1.default('30m'),
+const limiter2 = (0, express_rate_limit_1.default)({
+    windowMs: (0, ms_1.default)('30m'),
     max: 10
 });
 const cacheMiddleware = new express_cache_middleware_1.default(cache_manager_1.default.caching({
@@ -77,7 +81,7 @@ app.use(async function (req, res, next) {
         return next();
     else if (blocklist.some(el => el == ip))
         return exit();
-    else if (await istorexit_1.default(ip)) {
+    else if (await (0, istorexit_1.default)(ip)) {
         console.log('Blocked Tor:', ip);
         blocklist.push(ip);
         console.log('blocklist length:', blocklist.length);
@@ -90,12 +94,13 @@ app.use(async function (req, res, next) {
     }
 });
 app.use('/freePowerup/:accountName', limiter, async (req, res) => {
+    var _a;
     try {
-        console.log('Powerup Request:', req?.params?.accountName, req.headers['x-forwarded-for'] || req.socket.remoteAddress);
+        console.log('Powerup Request:', (_a = req === null || req === void 0 ? void 0 : req.params) === null || _a === void 0 ? void 0 : _a.accountName, req.headers['x-forwarded-for'] || req.socket.remoteAddress);
         console.log(req.rateLimit);
         const name = String(req.params.accountName).trim().toLowerCase();
         const result = await serverActions.freePowerup(name, req.query);
-        if (result?.status == 'error') {
+        if ((result === null || result === void 0 ? void 0 : result.status) == 'error') {
             res.statusCode = 400;
         }
         console.log(result);

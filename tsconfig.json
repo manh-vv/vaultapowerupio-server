@@ -19,7 +19,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2020",
+    "target": "ES2017",
     "strict": false,
     "sourceMap": true,
     "outDir": "dist",
@@ -29,7 +29,7 @@
     "allowJs": true,
     "checkJs": true,
     "moduleResolution": "node",
-    "resolveJsonModule": true,
+    // "resolveJsonModule": true,
     "esModuleInterop": true
   }
 }

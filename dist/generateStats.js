@@ -23,14 +23,14 @@ async function updateStats(data) {
         let totalDeposited = 0;
         let i = 0;
         let i2 = 0;
-        const owners = await eosio_1.getAllScopes({ code: env_1.default.contractAccount, table: eosio_2.Name.from("account") });
+        const owners = await (0, eosio_1.getAllScopes)({ code: env_1.default.contractAccount, table: eosio_2.Name.from("account") });
         stats.owners = owners.length;
         console.log('Owners', stats.owners);
         let getResults = [];
         owners.forEach(async (owner) => {
             getResults.push(new Promise(async (res, rej) => {
                 setTimeout(async () => {
-                    const result = await eosio_1.getFullTable({ tableName: eosio_2.Name.from("watchlist"), contract: env_1.default.contractAccount, scope: owner, type: eospowerupio_types_1.WatchlistRow });
+                    const result = await (0, eosio_1.getFullTable)({ tableName: eosio_2.Name.from("watchlist"), contract: env_1.default.contractAccount, scope: owner, type: eospowerupio_types_1.WatchlistRow });
                     totalWatched += result.length;
                     res(null);
                 }, 1410 * i);
@@ -38,15 +38,16 @@ async function updateStats(data) {
             }));
             getResults.push(new Promise(async (res, rej) => {
                 setTimeout(async () => {
-                    const result = await eosio_1.getFullTable({ tableName: eosio_2.Name.from("account"), contract: env_1.default.contractAccount, scope: owner, type: eospowerupio_types_1.AccountRow });
-                    totalDeposited += parseFloat(result[0]?.balance) || 0;
+                    var _a;
+                    const result = await (0, eosio_1.getFullTable)({ tableName: eosio_2.Name.from("account"), contract: env_1.default.contractAccount, scope: owner, type: eospowerupio_types_1.AccountRow });
+                    totalDeposited += parseFloat((_a = result[0]) === null || _a === void 0 ? void 0 : _a.balance) || 0;
                     res(null);
                 }, 1000 * i2);
                 i2++;
             }));
         });
         await Promise.all(getResults);
-        const errors = await db_1.default.rpcErrors.findMany({ where: { time: { gt: Date.now() - ms_1.default('2h') } } });
+        const errors = await db_1.default.rpcErrors.findMany({ where: { time: { gt: Date.now() - (0, ms_1.default)('2h') } } });
         const rpcErrorStats = {};
         for (const error of errors) {
             if (rpcErrorStats[error.endpoint])
@@ -54,12 +55,12 @@ async function updateStats(data) {
             else
                 rpcErrorStats[error.endpoint] = 1;
         }
-        const eosBal = parseFloat((await eosio_1.getFullTable({ contract: eosio_2.Name.from('eosio.token'), tableName: eosio_2.Name.from('accounts'), scope: env_1.default.contractAccount }))[0].balance);
-        const internalEOSBal = parseFloat((await eosio_1.getFullTable({ contract: env_1.default.contractAccount, tableName: eosio_2.Name.from('account'), scope: env_1.default.contractAccount }))[0].balance);
+        const eosBal = parseFloat((await (0, eosio_1.getFullTable)({ contract: eosio_2.Name.from('eosio.token'), tableName: eosio_2.Name.from('accounts'), scope: env_1.default.contractAccount }))[0].balance);
+        const internalEOSBal = parseFloat((await (0, eosio_1.getFullTable)({ contract: env_1.default.contractAccount, tableName: eosio_2.Name.from('account'), scope: env_1.default.contractAccount }))[0].balance);
         const registeredUsers = await db_1.default.user.aggregate({
             _count: { id: true },
         });
-        const monthAgo = Date.now() - ms_1.default('4w');
+        const monthAgo = Date.now() - (0, ms_1.default)('4w');
         console.log('monthAgo', monthAgo);
         const activeTgUsers = await db_1.default.user.aggregate({
             where: { freePowerups: { some: { time: { gt: monthAgo } } }, AND: { telegramId: { not: null } } },
@@ -71,7 +72,7 @@ async function updateStats(data) {
         });
         console.log(activeTgUsers._count._all);
         const allFreePowerups = await db_1.default.logpowerup.aggregate({
-            where: { payer: { equals: env_1.default.contractAccount.toString() }, blockTime: { gt: Date.now() - ms_1.default('1d') } },
+            where: { payer: { equals: env_1.default.contractAccount.toString() }, blockTime: { gt: Date.now() - (0, ms_1.default)('1d') } },
             _count: { _all: true },
             _sum: { cost: true }
         });
@@ -79,7 +80,7 @@ async function updateStats(data) {
         let freePowerups24hr = allFreePowerups._count._all;
         let freePowerupsCost24hr = allFreePowerups._sum.cost || 0;
         const recentPowerups = (await db_1.default.logpowerup.aggregate({
-            where: { blockTime: { gt: Date.now() - ms_1.default('1d') }, AND: { payer: { not: env_1.default.contractAccount.toString() } } },
+            where: { blockTime: { gt: Date.now() - (0, ms_1.default)('1d') }, AND: { payer: { not: env_1.default.contractAccount.toString() } } },
             _count: { _all: true },
             _sum: { fee: true, cost: true },
         }));
@@ -87,7 +88,7 @@ async function updateStats(data) {
         const autopowerupfees24hr = recentPowerups._sum.fee || 0;
         const autopowerupCost24hr = recentPowerups._sum.cost || 0;
         const autobuyram = (await db_1.default.logbuyram.aggregate({
-            where: { blockTime: { gt: Date.now() - ms_1.default('1d') } },
+            where: { blockTime: { gt: Date.now() - (0, ms_1.default)('1d') } },
             _count: { _all: true },
             _sum: { fee: true, cost: true }
         }));
@@ -147,7 +148,7 @@ async function updateStats(data) {
 if (require.main === module) {
     console.log("Starting: stats");
     updateStats(...process.argv.slice(2)).catch(console.error);
-    setInterval(updateStats, ms_1.default('1h'));
+    setInterval(updateStats, (0, ms_1.default)('1h'));
 }
 module.exports = { stats, updateStats };
 //# sourceMappingURL=generateStats.js.map

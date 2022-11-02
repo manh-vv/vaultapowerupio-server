@@ -23,7 +23,7 @@ async function init(...inputs) {
         bot.use(telegraf_1.Telegraf.log());
         bot.command('start', async (ctx) => {
             registerUser(ctx);
-            await ctx.replyWithPhoto({ source: fs_extra_1.readFileSync('../images/powerupBanner.jpg') }, { caption: "Welcome to eospowerup.io Bot, powered by Boid and Eden on EOS." });
+            await ctx.replyWithPhoto({ source: (0, fs_extra_1.readFileSync)('../images/powerupBanner.jpg') }, { caption: "Welcome to eospowerup.io Bot, powered by Boid and Eden on EOS." });
             await showMainMenu(ctx);
         }).catch(err => console.error(err.toString()));
         bot.hears('Free PowerUp', (ctx) => handleFreePowerUp(ctx)).catch(err => console.error(err.toString()));
@@ -75,7 +75,7 @@ async function registerUser(ctx) {
 }
 async function checkUserQuota(ctx) {
     const userid = await registerUser(ctx);
-    const tgQuota = await utils_1.checkQuota(userid);
+    const tgQuota = await (0, utils_1.checkQuota)(userid);
     if (tgQuota.error) {
         await ctx.reply(tgQuota.error);
         showMainMenu(ctx);
@@ -104,21 +104,21 @@ async function triggerPowerUp(ctx, payer, name) {
     displayAd(ctx);
     const statusMsg = await ctx.reply('Validating Account...');
     name = name.trim().toLowerCase();
-    const valid = await utils_1.accountExists(name);
+    const valid = await (0, utils_1.accountExists)(name);
     if (!valid)
         return bot.telegram.editMessageText(ctx.chat.id, statusMsg.message_id, null, name + ' is not a valid EOS Account');
     console.log(valid);
     let dots = [];
     let powerupResult;
     if (payer == env_1.default.contractAccount.toString()) {
-        serverActions_1.freePowerup(name).then(el => {
+        (0, serverActions_1.freePowerup)(name).then(el => {
             powerupResult = el;
         }).catch(error => {
             powerupResult = error;
         });
     }
     while (!powerupResult) {
-        await utils_1.sleep(500);
+        await (0, utils_1.sleep)(500);
         dots.push('⚡');
         await bot.telegram.editMessageText(ctx.chat.id, statusMsg.message_id, null, 'Powering Up' + dots.join(''));
         if (dots.length == 5)
@@ -158,5 +158,10 @@ if (require.main === module) {
         .then((result) => console.log('Finished'));
 }
 async function displayAd(ctx) {
+    return ctx.replyWithPhoto({ source: (0, fs_extra_1.readFileSync)('../images/bethash.png') }, {
+        caption: `<strong>Sign up and get 200 FREE Spins to play at the Fairest Casino here at BetHash.io.</strong>
+    <a href="https://forms.gle/g6FJj2SxadLAE7Wh8">BetHash.io claim free spins</a>
+    `, parse_mode: "HTML"
+    });
 }
 //# sourceMappingURL=tgBot.js.map

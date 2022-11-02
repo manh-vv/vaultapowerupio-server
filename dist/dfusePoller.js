@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -80,7 +84,7 @@ async function runQuery(dfuseQuery, cursor, low, table, query) {
         }, { variables: { cursor, low, limit: 20 } })
             .catch(async (error) => {
             console.error('dfuse gql error:', error);
-            if (error?.message == 'blocked: document quota exceeded') {
+            if ((error === null || error === void 0 ? void 0 : error.message) == 'blocked: document quota exceeded') {
                 console.log(currentClient, 'changing client');
                 if (currentClient == 'client1')
                     currentClient = 'client2';
@@ -90,17 +94,18 @@ async function runQuery(dfuseQuery, cursor, low, table, query) {
                     currentClient = 'client4';
                 else
                     currentClient = 'client1';
-                await sleep(ms_1.default('30s'));
+                await sleep((0, ms_1.default)('30s'));
                 res();
             }
             else {
-                await sleep(ms_1.default('30s'));
+                await sleep((0, ms_1.default)('30s'));
                 cleanExit();
             }
         });
     });
 }
 async function saveAction({ action, cursor, table, searchString }) {
+    var _a, _b;
     try {
         if (table === 'logpowerup') {
             const result = await db_1.default.logpowerup.upsert({
@@ -160,8 +165,8 @@ async function saveAction({ action, cursor, table, searchString }) {
         }
         else if (table == 'blacklist') {
             const result = await db_1.default.blacklist.upsert({
-                where: { account: action.data?.miner },
-                create: { account: action.data?.miner, reason: "Gravy Mining" },
+                where: { account: (_a = action.data) === null || _a === void 0 ? void 0 : _a.miner },
+                create: { account: (_b = action.data) === null || _b === void 0 ? void 0 : _b.miner, reason: "Gravy Mining" },
                 update: {}
             });
             console.log(result);
@@ -175,7 +180,7 @@ async function saveAction({ action, cursor, table, searchString }) {
     }
     catch (error) {
         console.error('saveAction Error:', error);
-        await sleep(ms_1.default('30s'));
+        await sleep((0, ms_1.default)('30s'));
         return saveAction({ action, cursor, table, searchString });
     }
 }
@@ -186,12 +191,13 @@ async function writeActions(actions) {
         }
         catch (error) {
             console.error("Write actions error:", error.toString());
-            await sleep(ms_1.default('10s'));
+            await sleep((0, ms_1.default)('10s'));
             return saveAction(action);
         }
     }
 }
 async function init(name, filter, replay) {
+    var _a;
     try {
         var low;
         var lastCursor;
@@ -203,9 +209,9 @@ async function init(name, filter, replay) {
             console.log("Replaying From Block:", low);
         }
         else {
-            let lastCursor = (await db_1.default.cursor.findFirst({
+            let lastCursor = (_a = (await db_1.default.cursor.findFirst({
                 where: { searchString: { equals: query } }
-            }))?.lowBlock;
+            }))) === null || _a === void 0 ? void 0 : _a.lowBlock;
             if (!lastCursor)
                 throw ("query does not have a previous cursor, start with replay first.");
             console.log('lst cursor', lastCursor);
@@ -241,7 +247,7 @@ async function start(params = process.argv) {
             filter = "";
         }
         init(params[2], filter, block).finally(async () => {
-            await sleep(ms_1.default('5s'));
+            await sleep((0, ms_1.default)('5s'));
             start(["", "", process.argv[2], filter]);
         });
     }

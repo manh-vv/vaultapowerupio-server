@@ -42,13 +42,13 @@ async function getResouceCosts(retry) {
             catch (error) {
                 console.error('Resource Costs Error:', url, error.toString());
                 errorCounter(url, error.toString());
-                await sleep(ms_1.default('8s'));
+                await sleep((0, ms_1.default)('8s'));
                 throw (error);
             }
         };
         const result = await Promise.race([
             doit(),
-            new Promise((res, reject) => setTimeout(() => reject(new Error("getResouceData Timeout!!!!")), ms_1.default('3s')))
+            new Promise((res, reject) => setTimeout(() => reject(new Error("getResouceData Timeout!!!!")), (0, ms_1.default)('3s')))
         ]);
         if (result)
             return result;
@@ -85,14 +85,14 @@ async function safeDo(cb, params, retry) {
                 }
                 else {
                     errorCounter(url, errorMsg);
-                    await sleep(ms_1.default('8s'));
+                    await sleep((0, ms_1.default)('8s'));
                     throw (error);
                 }
             }
         };
         const result = await Promise.race([
             doit(),
-            new Promise((res, reject) => setTimeout(() => reject(new Error("SafeDo Timeout:")), ms_1.default('3s')))
+            new Promise((res, reject) => setTimeout(() => reject(new Error("SafeDo Timeout:")), (0, ms_1.default)('3s')))
         ]);
         return result;
     }
@@ -176,28 +176,26 @@ async function doAction(name, data, contract, authorization, keys, retry) {
         account: contract,
         name, data
     });
-    const transaction = eosio_1.Transaction.from({
-        ...header,
-        actions: [action], max_cpu_usage_ms: 8,
-    });
+    const transaction = eosio_1.Transaction.from(Object.assign(Object.assign({}, header), { actions: [action], max_cpu_usage_ms: 8 }));
     if (!keys)
         keys = [env_1.default.keys[0]];
     const signatures = keys.map(key => key.signDigest(transaction.signingDigest(info.chain_id)));
-    const signedTransaction = eosio_1.SignedTransaction.from({ ...transaction, signatures });
+    const signedTransaction = eosio_1.SignedTransaction.from(Object.assign(Object.assign({}, transaction), { signatures }));
     let receipts = [];
     let errors = [];
-    let apis = utils_1.shuffle([...new Set(exports.rpcs)]);
+    let apis = (0, utils_1.shuffle)([...new Set(exports.rpcs)]);
     if (apis.length > 4) {
         apis = apis.splice(0, 4);
     }
-    const timeoutTimer = ms_1.default('10s');
+    const timeoutTimer = (0, ms_1.default)('10s');
     await Promise.all(apis.map(({ endpoint, rpc }) => {
         return Promise.race([
             new Promise((res) => {
                 rpc.push_transaction(signedTransaction).then(result => {
                     receipts.push({ url: endpoint.origin, receipt: result.processed });
                 }).catch((error) => {
-                    errors.push({ url: endpoint.origin, error: error?.error?.details[0]?.message || JSON.stringify(error?.error, null, 2) });
+                    var _a, _b;
+                    errors.push({ url: endpoint.origin, error: ((_b = (_a = error === null || error === void 0 ? void 0 : error.error) === null || _a === void 0 ? void 0 : _a.details[0]) === null || _b === void 0 ? void 0 : _b.message) || JSON.stringify(error === null || error === void 0 ? void 0 : error.error, null, 2) });
                 }).finally(() => res(null));
             }),
             new Promise((res) => setTimeout(() => {

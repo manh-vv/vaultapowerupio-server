@@ -12,10 +12,10 @@ const serverActions_1 = require("./lib/serverActions");
 const eosio_2 = require("@greymass/eosio");
 const eospowerupio_types_1 = require("./lib/types/eospowerupio.types");
 async function autoBuyRam(payer, watch) {
-    eosio_1.doAction('autobuyram', eospowerupio_types_1.Autobuyram.from({ payer, watch_account: watch.account }), null, [eosio_2.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission }), eosio_2.PermissionLevel.from({ actor: env_1.default.contractAccount, permission: "workers" })]);
+    (0, eosio_1.doAction)('autobuyram', eospowerupio_types_1.Autobuyram.from({ payer, watch_account: watch.account }), null, [eosio_2.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission }), eosio_2.PermissionLevel.from({ actor: env_1.default.contractAccount, permission: "workers" })]);
 }
 async function getAccountBw(account) {
-    const resources = await eosio_1.getAccount(account);
+    const resources = await (0, eosio_1.getAccount)(account);
     const msAvailable = resources.cpu_limit.available.toNumber() / 1000;
     const netAvailable = resources.net_limit.available.toNumber() / 1000;
     const quota = resources.ram_quota;
@@ -30,7 +30,7 @@ async function autoPowerup(owner, watch, doNet = false) {
     console.log(' ');
     let cpu = Math.max(watch.powerup_quantity_ms.toNumber(), 5);
     let net = Math.max(watch.powerup_quantity_ms.toNumber() * 3, 150);
-    serverActions_1.doAutoPowerup(owner, watch.account, cpu, net).then(el => {
+    (0, serverActions_1.doAutoPowerup)(owner, watch.account, cpu, net).then(el => {
         const receipt = el.receipts[0];
         if (receipt) {
             console.log(' ');
@@ -71,16 +71,16 @@ async function init(owner) {
         console.time('totalRun');
         let owners;
         if (!owner)
-            owners = await eosio_1.getAllScopes({ code: env_1.default.contractAccount, table: "account" });
+            owners = await (0, eosio_1.getAllScopes)({ code: env_1.default.contractAccount, table: "account" });
         else
             owners = [owner];
-        for (const owner of utils_1.shuffle(owners)) {
+        for (const owner of (0, utils_1.shuffle)(owners)) {
             let watchAccounts = [];
-            watchAccounts = (await eosio_1.getFullTable({ tableName: "watchlist", scope: owner, type: eospowerupio_types_1.WatchlistRow })).filter(el => el.active);
-            for (const watch of utils_1.shuffle(watchAccounts)) {
+            watchAccounts = (await (0, eosio_1.getFullTable)({ tableName: "watchlist", scope: owner, type: eospowerupio_types_1.WatchlistRow })).filter(el => el.active);
+            for (const watch of (0, utils_1.shuffle)(watchAccounts)) {
                 await Promise.race([
                     checkWatchAccount(owner, watch),
-                    new Promise((res, reject) => setTimeout(() => reject(new Error("checkWatchAccount Timeout!")), ms_1.default('8s')))
+                    new Promise((res, reject) => setTimeout(() => reject(new Error("checkWatchAccount Timeout!")), (0, ms_1.default)('8s')))
                 ]).catch(err => console.error(err.toString(), owner, watch));
             }
         }

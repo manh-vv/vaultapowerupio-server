@@ -1,16 +1,12 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const greenlock_proxy_1 = __importDefault(require("greenlock-proxy"));
+const GreenlockProxy = require('greenlock-proxy');
 async function init() {
     try {
-        var proxy = new greenlock_proxy_1.default({
+        var proxy = new GreenlockProxy({
             maintainerEmail: "john@boid.com",
             staging: false
         });
         proxy.register(["api.eospowerup.io"], ["http://localhost:3000"]);
+        proxy.register(["ipfs.eospowerup.io"], ["http://localhost:3333"]);
         proxy.start();
     }
     catch (error) {

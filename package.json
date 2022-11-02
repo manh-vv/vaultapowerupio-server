@@ -42,9 +42,16 @@
     "@types/express-rate-limit": "^5.1.1",
     "@types/node": "^15.6.1",
     "@types/source-map": "^0.5.7",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "eslint": "^8.0.1",
+    "eslint-config-standard-with-typescript": "^22.0.0",
+    "eslint-config-xo": "^0.40.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0",
+    "eslint-plugin-promise": "^6.0.0",
     "module-alias": "^2.2.2",
     "prisma": "^3.10.0",
     "ts-node": "^10.0.0",
-    "typescript": "^4.3.2"
+    "typescript": "*"
   }
 }

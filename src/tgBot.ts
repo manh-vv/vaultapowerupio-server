@@ -165,15 +165,19 @@ if (require.main === module) {
 }
 
 
+// async function displayAd(ctx: Context) {
+//   return ctx.replyWithPhoto({ source: readFileSync('../images/avatar-banner.webp') }, {
+//     caption: `<strong>Design your own NFT avatar and earn BOID when others mint your deisign.</strong>
+//     <a href="https://avatar.boid.com">Boid Avatars</a>
+//     `, parse_mode: "HTML"
+//   })
+// }
 async function displayAd(ctx: Context) {
-  // return ctx.replyWithPhoto({ source: readFileSync('../images/efx-hackathon.jpg') }, {
-  //   caption: `<strong>Join now and build a dApp on Effect Network-the decentralized gateway to the world's talent.</strong>
-  //   <a href="https://effect-network-hackathon.devpost.com/">Join Hackathon</a>
-  //   `, parse_mode: "HTML"
-  // })
-  // ctx.reply("🙏 You can help maintain free community PowerUps by sending any amount of EOS to eospowerupio with the memo donation.")
-  // ctx.reply("🚨 Donate at least 1 EOS to be included in the PowerUp NFT appreciation drop.")
-  // ctx.reply("🎄 Happy Holidays from EOS PowerUp!")
+  return ctx.replyWithPhoto({ source: readFileSync('../images/bethash.png') }, {
+    caption: `<strong>Sign up and get 200 FREE Spins to play at the Fairest Casino here at BetHash.io.</strong>
+    <a href="https://forms.gle/g6FJj2SxadLAE7Wh8">BetHash.io claim free spins</a>
+    `, parse_mode: "HTML"
+  })
 }
 
 //PowerUp Bronze NFT staking is now live! You can stake your Bronze NFT to receive additional CPU when claiming free PowerUps. Visit eospowerup.io/nft/activate for details.

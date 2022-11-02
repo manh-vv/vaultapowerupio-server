@@ -17,6 +17,7 @@ async function init() {
     try {
         const client = new discord_js_1.default.Client();
         client.on("message", async function (message) {
+            var _a, _b, _c;
             let args = message.content.split(' ');
             try {
                 if (message.author.bot)
@@ -25,20 +26,20 @@ async function init() {
                     if (args[0] == '<@!859243915054678067>')
                         args = args.splice(1, 5);
                 }
-                else if ((message.channel.type == "text") && message?.mentions?.members?.every(el => el.user.id == client.user.id)) {
+                else if ((message.channel.type == "text") && ((_b = (_a = message === null || message === void 0 ? void 0 : message.mentions) === null || _a === void 0 ? void 0 : _a.members) === null || _b === void 0 ? void 0 : _b.every(el => el.user.id == client.user.id))) {
                     if (args[0] != '<@!859243915054678067>')
                         return;
                     args = message.content.split(' ').splice(1, 5);
                 }
                 else
                     return;
-                const cmd = args[0]?.toLowerCase();
+                const cmd = (_c = args[0]) === null || _c === void 0 ? void 0 : _c.toLowerCase();
                 if (cmd == 'help') {
                     await showHelpMsg(message);
                 }
                 else if (cmd == 'powerup') {
                     const userid = await registerUser(message.author);
-                    const quota = await utils_1.checkQuota(userid);
+                    const quota = await (0, utils_1.checkQuota)(userid);
                     if (quota.error) {
                         await message.channel.send(quota.error);
                     }
@@ -102,21 +103,21 @@ async function registerUser(user) {
 async function triggerPowerUp(message, payer, name) {
     const statusMsg = await message.reply('Validating Account...');
     name = name.trim().toLowerCase();
-    const valid = await utils_1.accountExists(name);
+    const valid = await (0, utils_1.accountExists)(name);
     if (!valid)
         return await statusMsg.edit(name + ' is not a valid EOS Account');
     console.log(valid);
     let dots = [];
     let powerupResult;
     if (payer == env_1.default.contractAccount.toString()) {
-        serverActions_1.freePowerup(name).then(el => {
+        (0, serverActions_1.freePowerup)(name).then(el => {
             powerupResult = el;
         }).catch(error => {
             powerupResult = error;
         });
     }
     while (!powerupResult) {
-        await utils_1.sleep(500);
+        await (0, utils_1.sleep)(500);
         dots.push('⚡');
         await statusMsg.edit('Powering Up' + dots.join(''));
         if (dots.length == 5)

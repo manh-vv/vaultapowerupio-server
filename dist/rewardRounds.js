@@ -12,7 +12,7 @@ if (env_1.default.chain == 'eos')
     contract = 'powerup.nfts';
 console.log('using contract:', contract);
 async function getRound() {
-    const configTbl = await eosio_1.getFullTable({ tableName: 'config', contract, type: nftTypes_1.Config }).catch(err => console.error(err));
+    const configTbl = await (0, eosio_1.getFullTable)({ tableName: 'config', contract, type: nftTypes_1.Config }).catch(err => console.error(err));
     const conf = configTbl[0];
     const startTime = Date.parse(conf.start_time.toDate().toString()) / 1000;
     const now = (Date.now() / 1000);
@@ -22,13 +22,13 @@ async function getRound() {
     return round;
 }
 async function claimAll() {
-    const allClaimed = await eosio_1.getFullTable({ tableName: 'claimed', contract, type: nftTypes_1.Claimed });
+    const allClaimed = await (0, eosio_1.getFullTable)({ tableName: 'claimed', contract, type: nftTypes_1.Claimed });
     const unclaimed = allClaimed.filter(el => el.bronze_unclaimed.toNumber() > 0);
     console.log('found', unclaimed.length, 'unclaimed');
     for (const row of unclaimed) {
         console.log('claiming for', row.account.toString());
         let data = nftTypes_1.Claim.from({ donator: row.account });
-        const result = await eosio_1.doAction('claim', data, contract).catch(console.error);
+        const result = await (0, eosio_1.doAction)('claim', data, contract).catch(console.error);
         if (!result)
             console.error('claim erorr', row);
         else {
@@ -43,13 +43,13 @@ async function claimAll() {
 }
 async function init() {
     try {
-        const rounds = await eosio_1.getFullTable({ tableName: 'rounds', contract: 'powerup.nfts', type: nftTypes_1.Rounds });
+        const rounds = await (0, eosio_1.getFullTable)({ tableName: 'rounds', contract: 'powerup.nfts', type: nftTypes_1.Rounds });
         const currentRound = await getRound();
         const unrewarded = rounds.filter(el => el.rewarded == false && el.id.toNumber() != currentRound);
         console.log('found', unrewarded.length, 'unrewarded rounds');
         for (const round of unrewarded) {
             const data = nftTypes_1.Rewardround.from({ round_id: round.id });
-            const result = await eosio_1.doAction('rewardround', data, contract).catch(console.error);
+            const result = await (0, eosio_1.doAction)('rewardround', data, contract).catch(console.error);
             if (!result)
                 console.error('rewardround erorr', round);
             else {
@@ -69,5 +69,5 @@ async function init() {
     }
 }
 init();
-setInterval(init, ms_1.default('1hr'));
+setInterval(init, (0, ms_1.default)('1hr'));
 //# sourceMappingURL=rewardRounds.js.map

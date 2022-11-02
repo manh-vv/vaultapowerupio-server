@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -31,30 +35,30 @@ const env_1 = __importDefault(require("./env"));
 const ms_1 = __importDefault(require("ms"));
 const nft = __importStar(require("./types/nftTypes"));
 const freeDailyQuota = 2;
-setInterval(updateResourceCosts, ms_1.default('5 minutes'));
+setInterval(updateResourceCosts, (0, ms_1.default)('5 minutes'));
 updateResourceCosts();
 async function updateResourceCosts() {
-    exports.resourcesCosts = await eosio_2.getResouceCosts();
+    exports.resourcesCosts = await (0, eosio_2.getResouceCosts)();
 }
 async function doPowerup(payer, receiver, cpuQuantityMs, netQuantityMs) {
-    const { cpuMsCost, netKbCost, kbToFrac, msToFrac } = exports.resourcesCosts || await eosio_2.getResouceCosts();
+    const { cpuMsCost, netKbCost, kbToFrac, msToFrac } = exports.resourcesCosts || await (0, eosio_2.getResouceCosts)();
     const max_payment = eosio_1.Asset.from((((cpuMsCost * cpuQuantityMs) + (netKbCost * netQuantityMs)) * 1.05), eosio_1.Asset.Symbol.from("4,EOS"));
     const cpu_frac = msToFrac * cpuQuantityMs;
     const net_frac = kbToFrac * netQuantityMs;
     console.log('Max Payment:', max_payment.toString());
     const params = eospowerupio_types_1.Dopowerup.from({ cpu_frac, max_payment, payer, net_frac, receiver });
-    const results = await eosio_2.doAction('dopowerup', params);
+    const results = await (0, eosio_2.doAction)('dopowerup', params);
     return results;
 }
 exports.doPowerup = doPowerup;
 async function doAutoPowerup(payer, watch_account, cpuQuantityMs, netQuantityMs) {
-    const { cpuMsCost, netKbCost, kbToFrac, msToFrac } = exports.resourcesCosts || await eosio_2.getResouceCosts();
+    const { cpuMsCost, netKbCost, kbToFrac, msToFrac } = exports.resourcesCosts || await (0, eosio_2.getResouceCosts)();
     const max_payment = eosio_1.Asset.from((((cpuMsCost * cpuQuantityMs) + (netKbCost * netQuantityMs)) * 1.05), eosio_1.Asset.Symbol.from("4,EOS"));
     const cpu_frac = msToFrac * cpuQuantityMs;
     const net_frac = kbToFrac * netQuantityMs;
     console.log('Max Payment:', max_payment.toString());
     const params = eospowerupio_types_1.Autopowerup.from({ cpu_frac, max_payment, payer, net_frac, watch_account });
-    const results = await eosio_2.doAction('autopowerup', params, null, [eosio_1.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission }), eosio_1.PermissionLevel.from({ actor: env_1.default.contractAccount, permission: "workers" })]);
+    const results = await (0, eosio_2.doAction)('autopowerup', params, null, [eosio_1.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission }), eosio_1.PermissionLevel.from({ actor: env_1.default.contractAccount, permission: "workers" })]);
     return results;
 }
 exports.doAutoPowerup = doAutoPowerup;
@@ -65,7 +69,7 @@ async function checkBlacklist(account) {
 let nftConfig;
 async function loadNftConfig() {
     if (!nftConfig) {
-        const config = nft.Config.from((await eosio_2.getFullTable({ tableName: 'config', contract: env_1.default.nftContract, type: nft.Config }))[0]);
+        const config = nft.Config.from((await (0, eosio_2.getFullTable)({ tableName: 'config', contract: env_1.default.nftContract, type: nft.Config }))[0]);
         nftConfig = config.nft;
         return nftConfig;
     }
@@ -75,7 +79,7 @@ async function loadNftConfig() {
 exports.loadNftConfig = loadNftConfig;
 async function loadAccountStakes(account) {
     try {
-        const accountStaked = await eosio_2.getFullTable({ tableName: "staked", contract: env_1.default.nftContract, scope: account, type: nft.Staked });
+        const accountStaked = await (0, eosio_2.getFullTable)({ tableName: "staked", contract: env_1.default.nftContract, scope: account, type: nft.Staked });
         return accountStaked;
     }
     catch (error) {
@@ -106,7 +110,7 @@ async function freePowerup(accountName, params) {
         where: {
             receiver: accountName.toString(),
             payer: env_1.default.contractAccount.toString(),
-            time: { gte: Date.now() - ms_1.default('24hr') },
+            time: { gte: Date.now() - (0, ms_1.default)('24hr') },
             failed: { not: true }
         },
         orderBy: { time: 'desc' },
@@ -117,7 +121,7 @@ async function freePowerup(accountName, params) {
         const cpu = bonusSize ? 6 : 3;
         const net = bonusSize ? 40 : 20;
         const result = await doPowerup(env_1.default.contractAccount, accountName, cpu, net);
-        if (result?.receipts.length > 0) {
+        if ((result === null || result === void 0 ? void 0 : result.receipts.length) > 0) {
             const powerupData = eospowerupio_types_1.Dopowerup.from(result.receipts[0].receipt.action_traces[0].act.data);
             const logPowerUpData = eospowerupio_types_1.Logpowerup.from(result.receipts[0].receipt.action_traces[0].inline_traces[1].inline_traces[0].act.data);
             await db_1.default.dopowerup.create({
@@ -139,7 +143,7 @@ async function freePowerup(accountName, params) {
     else {
         const oldest = recentPowerups[recentPowerups.length - 1];
         const elapsed = Date.now() - parseInt(oldest.time.toString());
-        const timeLeft = ms_1.default('24h') - elapsed;
+        const timeLeft = (0, ms_1.default)('24h') - elapsed;
         const nextPowerup = Date.now() + timeLeft;
         return { status: 'reachedFreeQuota', nextPowerup, recentPowerups };
     }

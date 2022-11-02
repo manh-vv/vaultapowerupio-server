@@ -49,7 +49,7 @@ async function accountExists(name) {
     if (!validRegex.test(name))
         return false;
     try {
-        const result = await eosio_2.getAccount(eosio_1.Name.from(name));
+        const result = await (0, eosio_2.getAccount)(eosio_1.Name.from(name));
         if (result)
             return true;
         else
@@ -64,7 +64,7 @@ exports.accountExists = accountExists;
 async function checkQuota(userid) {
     try {
         const recentPowerups = await db_1.default.dopowerup.findMany({
-            where: { User: { id: userid }, payer: env_1.default.contractAccount.toString(), time: { gte: Date.now() - ms_1.default('24hr') }, failed: { not: true } },
+            where: { User: { id: userid }, payer: env_1.default.contractAccount.toString(), time: { gte: Date.now() - (0, ms_1.default)('24hr') }, failed: { not: true } },
             orderBy: { time: 'desc' },
         });
         if (recentPowerups.length >= exports.freeDailyQuota) {
@@ -73,7 +73,7 @@ async function checkQuota(userid) {
             console.log(oldest);
             const elapsed = parseInt((BigInt(Date.now()) - oldest.time).toString());
             console.log('elapsed', elapsed);
-            const timeLeft = ms_1.default('24h') - elapsed;
+            const timeLeft = (0, ms_1.default)('24h') - elapsed;
             const nextPowerup = Date.now() + timeLeft;
             console.log('msleft:', timeLeft);
             return { nextPowerup, quotaAvailable: 0 };
