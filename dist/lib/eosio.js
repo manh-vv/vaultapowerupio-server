@@ -184,8 +184,8 @@ async function doAction(name, data, contract, authorization, keys, retry) {
     let receipts = [];
     let errors = [];
     let apis = (0, utils_1.shuffle)([...new Set(exports.rpcs)]);
-    if (apis.length > 4) {
-        apis = apis.splice(0, 4);
+    if (apis.length > 2) {
+        apis = apis.splice(0, 2);
     }
     const timeoutTimer = (0, ms_1.default)('10s');
     await Promise.all(apis.map(({ endpoint, rpc }) => {

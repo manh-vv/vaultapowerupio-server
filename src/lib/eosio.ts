@@ -208,8 +208,8 @@ export async function doAction(name: NameType, data?: { [key: string]: any } | n
   let receipts: TransactionResponse[] = []
   let errors: any[] = []
   let apis = shuffle([...new Set(rpcs)])
-  if (apis.length > 4) {
-    apis = apis.splice(0, 4)
+  if (apis.length > 2) {
+    apis = apis.splice(0, 2)
   }
   // console.log('Pushing Tx using APIs:', apis.length, apis.map(el => el.endpoint.toString()));
 
