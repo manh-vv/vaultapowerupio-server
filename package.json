@@ -2,7 +2,8 @@
   "scripts": {
     "dev": "tsc -p . --watch ",
     "build": "tsc -p .",
-    "studio": "prisma studio"
+    "studio": "prisma studio",
+    "lint": "eslint ./src --ext .ts --fix"
   },
   "dependencies": {
     "@dfuse/client": "^0.3.20",
@@ -43,10 +44,11 @@
     "@types/node": "^15.6.1",
     "@types/source-map": "^0.5.7",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "eslint": "^8.0.1",
+    "eslint": "^8.32.0",
     "eslint-config-standard-with-typescript": "^22.0.0",
     "eslint-config-xo": "^0.40.0",
     "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "module-alias": "^2.2.2",

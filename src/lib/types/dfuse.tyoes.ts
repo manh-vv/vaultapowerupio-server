@@ -1,20 +1,20 @@
 export interface action {
-  seq: number
-  name: string
-  block: {
-    num: number
-    timestamp: number
+  seq:number
+  name:string
+  block:{
+    num:number
+    timestamp:number
   }
-  txid: string
-  data: {
-    [key: string]: any
+  txid:string
+  data:{
+    [key:string]:any
   },
-  account: string
+  account:string
 }
 
 export interface ActionQueue {
-  action: action
-  cursor: string
-  table: string
-  searchString: string
+  action:action
+  cursor:string
+  table:string
+  searchString:string
 }

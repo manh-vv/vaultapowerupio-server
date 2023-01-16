@@ -4,7 +4,7 @@ module.exports = {
       name: "listener-transfers",
       cwd: "./dist/",
       script: "./dfusePoller.js",
-      args: 'transfer',
+      args: "transfer",
       env: {
         CHAIN: "eos"
       }
@@ -13,7 +13,7 @@ module.exports = {
       name: "listener-logbuyram",
       cwd: "./dist/",
       script: "./dfusePoller.js",
-      args: 'logbuyram',
+      args: "logbuyram",
       env: {
         CHAIN: "eos"
       }
@@ -22,7 +22,7 @@ module.exports = {
       name: "listener-logpowerup",
       cwd: "./dist/",
       script: "./dfusePoller.js",
-      args: 'logpowerup',
+      args: "logpowerup",
       env: {
         CHAIN: "eos"
       }
@@ -91,4 +91,4 @@ module.exports = {
       }
     }
   ]
-};
+}

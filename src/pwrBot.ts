@@ -1,17 +1,17 @@
-require('dotenv').config()
-import env from './lib/env'
-import { getAccount, doAction, getFullTable, getResouceCosts, ResourceCosts, getAllScopes } from './lib/eosio'
-import ms from 'ms'
-import { shuffle } from './lib/utils'
-import { doAutoPowerup, resourcesCosts } from './lib/serverActions'
-import { Name, NameType, PermissionLevel } from '@greymass/eosio'
-import { Autobuyram, Autopowerup, WatchlistRow } from './lib/types/eospowerupio.types'
+import env from "./lib/env"
+import { getAccount, doAction, getFullTable, getResouceCosts, ResourceCosts, getAllScopes } from "./lib/eosio"
+import ms from "ms"
+import { shuffle } from "./lib/utils"
+import { doAutoPowerup, resourcesCosts } from "./lib/serverActions"
+import { Name, NameType, PermissionLevel } from "@greymass/eosio"
+import { Autobuyram, Autopowerup, WatchlistRow } from "./lib/types/eospowerupio.types"
+require("dotenv").config()
 
-async function autoBuyRam(payer: Name, watch: WatchlistRow) {
-  doAction('autobuyram', Autobuyram.from({ payer, watch_account: watch.account }), null, [PermissionLevel.from({ actor: env.workerAccount, permission: env.workerPermission }), PermissionLevel.from({ actor: env.contractAccount, permission: "workers" })])
+async function autoBuyRam(payer:Name, watch:WatchlistRow) {
+  doAction("autobuyram", Autobuyram.from({ payer, watch_account: watch.account }), null, [PermissionLevel.from({ actor: env.workerAccount, permission: env.workerPermission }), PermissionLevel.from({ actor: env.contractAccount, permission: "workers" })])
 }
 
-async function getAccountBw(account: Name) {
+async function getAccountBw(account:Name) {
   const resources = await getAccount(account)
   const msAvailable = resources.cpu_limit.available.toNumber() / 1000
   // console.log("Remaining CPU Ms:", msAvailable);
@@ -24,10 +24,10 @@ async function getAccountBw(account: Name) {
   return { msAvailable, netAvailable, resources, remainingKb }
 }
 
-async function autoPowerup(owner: Name, watch: WatchlistRow, doNet: Boolean = false) {
-  console.log(' ');
-  console.log('AutoPowerUp Triggered for:', watch.account.toString());
-  console.log(' ');
+async function autoPowerup(owner:Name, watch:WatchlistRow, doNet:Boolean = false) {
+  console.log(" ")
+  console.log("AutoPowerUp Triggered for:", watch.account.toString())
+  console.log(" ")
 
   let cpu = Math.max(watch.powerup_quantity_ms.toNumber(), 5)
   let net = Math.max(watch.powerup_quantity_ms.toNumber() * 3, 150)
@@ -36,26 +36,26 @@ async function autoPowerup(owner: Name, watch: WatchlistRow, doNet: Boolean = fa
   doAutoPowerup(owner, watch.account, cpu, net).then(el => {
     const receipt = el.receipts[0]
     if (receipt) {
-      console.log(' ');
-      console.log('PowerUp Issued:', owner.toString(), watch.account.toString());
-      console.log('CPU:', cpu);
-      console.log('NET:', net);
-      console.log(receipt.url + ": " + receipt.receipt.id);
-      console.log(' ');
+      console.log(" ")
+      console.log("PowerUp Issued:", owner.toString(), watch.account.toString())
+      console.log("CPU:", cpu)
+      console.log("NET:", net)
+      console.log(receipt.url + ": " + receipt.receipt.id)
+      console.log(" ")
     } else {
-      console.log(' ');
-      console.error('PowerUp Error:', owner.toString(), watch.account.toString());
-      console.error('CPU:', cpu);
-      console.error('NET:', net);
-      console.error(el.errors);
-      console.log(' ');
+      console.log(" ")
+      console.error("PowerUp Error:", owner.toString(), watch.account.toString())
+      console.error("CPU:", cpu)
+      console.error("NET:", net)
+      console.error(el.errors)
+      console.log(" ")
     }
   })
 }
 
-async function checkWatchAccount(owner, watch: WatchlistRow) {
+async function checkWatchAccount(owner, watch:WatchlistRow) {
   const { msAvailable, netAvailable, remainingKb } = await getAccountBw(watch.account)
-  console.log('Available:', watch.account.toString(), "CPU:", msAvailable, "NET:", netAvailable, "RAM:", remainingKb);
+  console.log("Available:", watch.account.toString(), "CPU:", msAvailable, "NET:", netAvailable, "RAM:", remainingKb)
 
   if (watch.min_cpu_ms.toNumber() > 0) {
     if (msAvailable <= watch.min_cpu_ms.toNumber()) autoPowerup(owner, watch)
@@ -66,32 +66,32 @@ async function checkWatchAccount(owner, watch: WatchlistRow) {
   }
 }
 
-async function init(owner?: NameType) {
+async function init(owner?:NameType) {
   try {
     if (owner) owner = Name.from(owner)
-    console.time('totalRun')
-    let owners: NameType[]
+    console.time("totalRun")
+    let owners:NameType[]
     if (!owner) owners = await getAllScopes({ code: env.contractAccount, table: "account" })
     else owners = [owner]
     // console.log('Owners:', owners.length);
 
     for (const owner of shuffle(owners)) {
       // console.log("Owner:", owner.toString())
-      let watchAccounts: WatchlistRow[] = []
+      let watchAccounts:WatchlistRow[] = []
       watchAccounts = (await getFullTable({ tableName: "watchlist", scope: owner, type: WatchlistRow })).filter(el => el.active)
       for (const watch of shuffle(watchAccounts)) {
         // console.time('checkWatch')
         await Promise.race([
           checkWatchAccount(owner, watch),
-          new Promise((res, reject) => setTimeout(() => reject(new Error("checkWatchAccount Timeout!")), ms('8s')))
+          new Promise((res, reject) => setTimeout(() => reject(new Error("checkWatchAccount Timeout!")), ms("8s")))
         ]).catch(err => console.error(err.toString(), owner, watch))
         // console.timeEnd('checkWatch')
       }
     }
   } catch (error) {
-    console.error('pwrBot error:', error)
+    console.error("pwrBot error:", error)
   }
-  console.timeEnd('totalRun')
+  console.timeEnd("totalRun")
 }
 
 async function loop() {

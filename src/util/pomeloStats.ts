@@ -1,6 +1,6 @@
-import db from "../lib/db";
-import { Transfer } from "@prisma/client";
-import fs from 'fs-extra'
+import db from "../lib/db"
+import { Transfer } from "@prisma/client"
+import fs from "fs-extra"
 
 
 async function createList() {
@@ -28,7 +28,7 @@ async function createList() {
     const results = { donated, matched }
     await fs.writeJson("../pomeloList.json", results, { spaces: 2 })
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
 }
 

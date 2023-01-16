@@ -1,9 +1,9 @@
 // import GreenlockProxy from 'greenlock-proxy'
-const GreenlockProxy = require('greenlock-proxy')
+const GreenlockProxy = require("greenlock-proxy")
 
 async function init() {
   try {
-    var proxy = new GreenlockProxy({
+    let proxy = new GreenlockProxy({
       maintainerEmail: "john@boid.com", // your email
       staging: false
     })
@@ -16,7 +16,7 @@ async function init() {
     // Start proxiyng
     proxy.start()
   } catch (error) {
-    console.error('proxy error:', error);
+    console.error("proxy error:", error)
     process.kill(process.pid)
   }
 }
