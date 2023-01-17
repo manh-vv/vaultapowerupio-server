@@ -1,58 +1,60 @@
-"use strict"
-let __importDefault = (this && this.__importDefault) || function(mod) {
-  return (mod && mod.__esModule) ? mod : { "default": mod }
-}
-Object.defineProperty(exports, "__esModule", { value: true })
-const sqlite3_1 = __importDefault(require("sqlite3"))
-const sqlite_1 = require("sqlite")
-const db_1 = __importDefault(require("../lib/db"))
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const sqlite3_1 = __importDefault(require("sqlite3"));
+const sqlite_1 = require("sqlite");
+const db_1 = __importDefault(require("../lib/db"));
 async function init() {
-  try {
-    const sqlite = await (0, sqlite_1.open)({
-      filename: "../prisma/dev.db",
-      driver: sqlite3_1.default.Database
-    })
-    const rows = await sqlite.all(`
+    try {
+        const sqlite = await (0, sqlite_1.open)({
+            filename: "../prisma/dev.db",
+            driver: sqlite3_1.default.Database
+        });
+        const rows = await sqlite.all(`
     SELECT *
     FROM Logpowerup
-    `)
-    console.log(rows.length)
-    console.log(rows[0].txid)
-    let i = 0
-    for (let row of rows) {
-      i++
-      const result = await db_1.default.logpowerup.upsert({ where: { seq: row.seq }, create: row, update: {} })
-      console.log(result)
-      console.log(i)
+    `);
+        console.log(rows.length);
+        console.log(rows[0].txid);
+        let i = 0;
+        for (let row of rows) {
+            i++;
+            const result = await db_1.default.logpowerup.upsert({ where: { seq: row.seq }, create: row, update: {} });
+            console.log(result);
+            console.log(i);
+        }
     }
-  } catch (error) {
-    console.error(error)
-  }
+    catch (error) {
+        console.error(error);
+    }
 }
 async function init2() {
-  try {
-    const sqlite = await (0, sqlite_1.open)({
-      filename: "../prisma/1dev.db",
-      driver: sqlite3_1.default.Database
-    })
-    const rows = await sqlite.all(`
+    try {
+        const sqlite = await (0, sqlite_1.open)({
+            filename: "../prisma/1dev.db",
+            driver: sqlite3_1.default.Database
+        });
+        const rows = await sqlite.all(`
     SELECT *
     FROM Logpowerup
-    `)
-    console.log(rows.length)
-    console.log(rows[0].txid)
-    let i = 0
-    for (let row of rows) {
-      i++
-      const result = await db_1.default.logpowerup.upsert({ where: { seq: row.seq }, create: row, update: {} })
-      console.log(result)
-      console.log(i)
+    `);
+        console.log(rows.length);
+        console.log(rows[0].txid);
+        let i = 0;
+        for (let row of rows) {
+            i++;
+            const result = await db_1.default.logpowerup.upsert({ where: { seq: row.seq }, create: row, update: {} });
+            console.log(result);
+            console.log(i);
+        }
     }
-  } catch (error) {
-    console.error(error)
-  }
+    catch (error) {
+        console.error(error);
+    }
 }
-init()
+init();
 let allTables = `
 SELECT
   name
@@ -61,5 +63,5 @@ FROM
 WHERE
   type ='table' AND
   name NOT LIKE 'sqlite_%';
-`
+`;
 //# sourceMappingURL=migrate.js.map

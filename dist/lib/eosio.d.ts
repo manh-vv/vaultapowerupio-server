@@ -1,9 +1,9 @@
-import { API, APIClient, Name, PermissionLevel, PrivateKey, NameType } from '@greymass/eosio';
+import { API, APIClient, Name, PermissionLevel, PrivateKey, NameType } from "@greymass/eosio";
 declare let client: APIClient;
-export declare let rpcs: {
+export declare let rpcs: Array<{
     endpoint: URL;
     rpc: typeof client.v1.chain;
-}[];
+}>;
 interface TransactionResponse {
     url: string;
     receipt: {

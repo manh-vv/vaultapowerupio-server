@@ -1,13 +1,13 @@
-import { Name, NameType } from '@greymass/eosio';
-import { ResourceCosts } from './eosio';
-import { Logpowerup } from './types/eospowerupio.types';
-import { Dopowerup } from '@prisma/client';
-import * as nft from './types/nftTypes';
+import { Name, NameType } from "@greymass/eosio";
+import { ResourceCosts } from "./eosio";
+import { Logpowerup } from "./types/eospowerupio.types";
+import { Dopowerup } from "@prisma/client";
+import * as nft from "./types/nftTypes";
 export declare let resourcesCosts: ResourceCosts;
 export declare function doPowerup(payer: NameType, receiver: NameType, cpuQuantityMs: number, netQuantityMs: number): Promise<import("./eosio").DoActionResponse>;
 export declare function doAutoPowerup(payer: NameType, watch_account: NameType, cpuQuantityMs: number, netQuantityMs: number): Promise<import("./eosio").DoActionResponse>;
 export interface FreePowerupResult {
-    status: 'success' | 'error' | 'reachedFreeQuota' | 'blacklisted';
+    status: "success" | "error" | "reachedFreeQuota" | "blacklisted";
     powerupLog?: Logpowerup;
     txid?: string;
     recentPowerups?: Dopowerup[];

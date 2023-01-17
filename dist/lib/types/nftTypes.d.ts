@@ -1,4 +1,4 @@
-import { Asset, Float32, Name, Struct, TimePointSec, UInt16, UInt32, UInt64, UInt8 } from '@greymass/eosio';
+import { Asset, Float32, Name, Struct, TimePointSec, UInt16, UInt32, UInt64, UInt8 } from "@greymass/eosio";
 export declare class Balances extends Struct {
     template_id: UInt32;
     balance: UInt16;

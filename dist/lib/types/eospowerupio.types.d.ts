@@ -1,4 +1,4 @@
-import { Asset, Float32, Name, Struct, UInt16, UInt32, UInt64 } from '@greymass/eosio';
+import { Asset, Float32, Name, Struct, UInt16, UInt32, UInt64 } from "@greymass/eosio";
 export declare class AccountRow extends Struct {
     balance: Asset;
 }
