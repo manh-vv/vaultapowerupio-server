@@ -58,8 +58,7 @@ async function checkWatchAccount(owner, watch:WatchlistRow) {
   console.log("Available:", watch.account.toString(), "CPU:", msAvailable, "NET:", netAvailable, "RAM:", remainingKb)
 
   if (watch.min_cpu_ms.toNumber() > 0) {
-    if (msAvailable <= watch.min_cpu_ms.toNumber()) autoPowerup(owner, watch)
-    if (netAvailable <= watch.min_cpu_ms.toNumber() / 4) autoPowerup(owner, watch, true)
+    if (msAvailable <= watch.min_cpu_ms.toNumber() || netAvailable <= watch.min_cpu_ms.toNumber() / 4) autoPowerup(owner, watch)
   }
   if (watch.min_kb_ram.toNumber() > 0 && watch.buy_ram_quantity_kb.toNumber() > 0) {
     if (remainingKb <= watch.min_kb_ram.toNumber()) autoBuyRam(owner, watch)
