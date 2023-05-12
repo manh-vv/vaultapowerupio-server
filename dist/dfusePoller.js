@@ -81,7 +81,7 @@ async function runQuery(dfuseQuery, cursor, low, table, query) {
                 stream.close();
                 res();
             }
-        }, { variables: { cursor, low, limit: 20 } })
+        }, { variables: { low, limit: 20 } })
             .catch(async (error) => {
             console.error("dfuse gql error:", error);
             if ((error === null || error === void 0 ? void 0 : error.message) == "blocked: document quota exceeded") {
@@ -217,19 +217,22 @@ async function init(name, filter, replay) {
                 throw new Error("query does not have a previous cursor, start with replay first.");
             console.log("lst cursor", lastCursor);
             low = parseInt(lastCursor.toString()) + 1;
+            console.log("low:", low);
         }
         console.log("Query:", query);
-        const streamTransfer = `query($cursor: String, $low: Int64,$limit:Int64) {
-      searchTransactionsForward(query:"${query}", cursor: $cursor, limit:$limit irreversibleOnly:true, lowBlockNum: $low) {
-        results{ cursor
-        trace { id block{num timestamp} matchingActions{ seq json receiver name }}
+        const streamTransfer = `query {
+      searchTransactionsForward(query:"${query}", limit:10 irreversibleOnly:true, lowBlockNum:-500) {
+        results{
+          cursor
+          trace { id block { num timestamp } matchingActions { seq json receiver name } }
         }
       }
     }`;
+        console.log(streamTransfer);
         await runQuery(streamTransfer, null, low, queries[name].table, query);
     }
     catch (error) {
-        console.error("INIT ERROR:", error);
+        console.error("INIT ERROR:", error.toString());
         cleanExit();
     }
 }

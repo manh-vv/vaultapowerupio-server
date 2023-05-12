@@ -11,6 +11,7 @@ async function init() {
     // Just bind your domain to internal address - common example
     proxy.register(["api.eospowerup.io"], ["http://localhost:3000"])
     proxy.register(["ipfs.eospowerup.io"], ["http://localhost:3333"])
+    proxy.register(["umami.boid.com"], ["http://localhost:4000"])
 
 
     // Start proxiyng
