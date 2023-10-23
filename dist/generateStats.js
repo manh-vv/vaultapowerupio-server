@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mixpanel_1 = __importDefault(require("mixpanel"));
-const eosio_1 = require("./lib/eosio");
-const env_1 = __importDefault(require("./lib/env"));
+const eosio_1 = require("./lib/eosio.js");
+const env_1 = __importDefault(require("./lib/env.js"));
 const eosio_2 = require("@greymass/eosio");
-const eospowerupio_types_1 = require("./lib/types/eospowerupio.types");
-const db_1 = __importDefault(require("./lib/db"));
+const eospowerupio_types_1 = require("./lib/types/eospowerupio.types.js");
+const db_1 = __importDefault(require("./lib/db.js"));
 const ms_1 = __importDefault(require("ms"));
 let mixpanel = mixpanel_1.default.init("9ff1909bddc4e74db9192b48f0149941", {
     protocol: "https"

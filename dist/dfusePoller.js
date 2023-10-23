@@ -26,10 +26,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const dfuse = __importStar(require("./lib/dfuse"));
+const dfuse = __importStar(require("./lib/dfuse.js"));
 const ms_1 = __importDefault(require("ms"));
-const db_1 = __importDefault(require("./lib/db"));
-const env_1 = __importDefault(require("./lib/env"));
+const db_1 = __importDefault(require("./lib/db.js"));
+const env_1 = __importDefault(require("./lib/env.js"));
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 const queries = {
     logpowerup: { search: `action:logpowerup notif:false receiver:${env_1.default.contractAccount.toString()}`, table: "logpowerup" },
@@ -39,7 +39,8 @@ const queries = {
     pomelo: { search: "account:eosio.token action:transfer receiver:app.pomelo data.to:app.pomelo -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee", table: "transfer" },
     pomeloClaim: { search: "account:eosio.token action:transfer receiver:claim.pomelo data.to:animus.inc -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee", table: "transfer" },
     regminer: { search: "account:gravyhftdefi action:regminer receiver:gravyhftdefi", table: "blacklist" },
-    grvmine: { search: "account:gravyhftdefi action:mine", table: "blacklist" }
+    grvmine: { search: "account:gravyhftdefi action:mine", table: "blacklist" },
+    webxmine: { search: "account:webxtokenacc action:regminer", table: "blacklist" }
 };
 let currentClient = "client1";
 function parseActions(action) {
@@ -95,7 +96,7 @@ async function runQuery(dfuseQuery, cursor, low, table, query) {
                 else
                     currentClient = "client1";
                 await sleep((0, ms_1.default)("30s"));
-                res();
+                runQuery(dfuseQuery, cursor, low, table, query);
             }
             else {
                 await sleep((0, ms_1.default)("30s"));
@@ -167,7 +168,7 @@ async function saveAction({ action, cursor, table, searchString }) {
         else if (table == "blacklist") {
             const result = await db_1.default.blacklist.upsert({
                 where: { account: (_a = action.data) === null || _a === void 0 ? void 0 : _a.miner },
-                create: { account: (_b = action.data) === null || _b === void 0 ? void 0 : _b.miner, reason: "Gravy Mining" },
+                create: { account: (_b = action.data) === null || _b === void 0 ? void 0 : _b.miner, reason: "Mining" },
                 update: {}
             });
             console.log(result);
@@ -221,7 +222,7 @@ async function init(name, filter, replay) {
         }
         console.log("Query:", query);
         const streamTransfer = `query {
-      searchTransactionsForward(query:"${query}", limit:10 irreversibleOnly:true, lowBlockNum:-500) {
+      searchTransactionsForward(query:"${query}", limit:10 irreversibleOnly:true, lowBlockNum:${low}) {
         results{
           cursor
           trace { id block { num timestamp } matchingActions { seq json receiver name } }

@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const env_1 = __importDefault(require("./lib/env"));
-const eosio_1 = require("./lib/eosio");
+const env_1 = __importDefault(require("./lib/env.js"));
+const eosio_1 = require("./lib/eosio.js");
 const ms_1 = __importDefault(require("ms"));
-const nftTypes_1 = require("./lib/types/nftTypes");
+const nftTypes_1 = require("./lib/types/nftTypes.js");
 let contract = "pwrupnfts";
 if (env_1.default.chain == "eos")
     contract = "powerup.nfts";

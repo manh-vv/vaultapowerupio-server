@@ -3,13 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const env_1 = __importDefault(require("./lib/env"));
-const eosio_1 = require("./lib/eosio");
+const env_1 = __importDefault(require("./lib/env.js"));
+const eosio_1 = require("./lib/eosio.js");
 const ms_1 = __importDefault(require("ms"));
-const utils_1 = require("./lib/utils");
-const serverActions_1 = require("./lib/serverActions");
+const utils_1 = require("./lib/utils.js");
+const serverActions_1 = require("./lib/serverActions.js");
 const eosio_2 = require("@greymass/eosio");
-const eospowerupio_types_1 = require("./lib/types/eospowerupio.types");
+const eospowerupio_types_1 = require("./lib/types/eospowerupio.types.js");
 require("dotenv").config();
 async function autoBuyRam(payer, watch) {
     (0, eosio_1.doAction)("autobuyram", eospowerupio_types_1.Autobuyram.from({ payer, watch_account: watch.account }), null, [eosio_2.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission }), eosio_2.PermissionLevel.from({ actor: env_1.default.contractAccount, permission: "workers" })]);

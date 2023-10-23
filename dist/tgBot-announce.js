@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const telegraf_1 = require("telegraf");
-const env_1 = __importDefault(require("./lib/env"));
-const db_1 = __importDefault(require("./lib/db"));
+const env_1 = __importDefault(require("./lib/env.js"));
+const db_1 = __importDefault(require("./lib/db.js"));
 const token = env_1.default.telegramKey;
 if (token === undefined) {
     throw new Error("telegramKey Missing!");

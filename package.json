@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "dev": "tsc -p . --watch ",
-    "build": "tsc -p .",
+    "dev": "nodemon -w ./src -e .ts --exec \"yarn build || exit 1\"",
+    "build": "tsc && tsc-alias -f",
     "studio": "prisma studio",
     "lint": "eslint ./src --ext .ts --fix"
   },
@@ -52,8 +52,10 @@
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "module-alias": "^2.2.2",
+    "nodemon": "^2.0.22",
     "prisma": "^3.10.0",
     "ts-node": "^10.0.0",
+    "tsc-alias": "^1.8.6",
     "typescript": "*"
   }
 }

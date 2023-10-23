@@ -28,12 +28,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStats = exports.freePowerup = exports.hasBronzeStake = exports.loadAccountStakes = exports.loadNftConfig = exports.doAutoPowerup = exports.doPowerup = exports.resourcesCosts = void 0;
 const eosio_1 = require("@greymass/eosio");
-const eosio_2 = require("./eosio");
-const eospowerupio_types_1 = require("./types/eospowerupio.types");
-const db_1 = __importDefault(require("./db"));
-const env_1 = __importDefault(require("./env"));
+const eosio_2 = require("./eosio.js");
+const eospowerupio_types_1 = require("./types/eospowerupio.types.js");
+const db_1 = __importDefault(require("./db.js"));
+const env_1 = __importDefault(require("./env.js"));
 const ms_1 = __importDefault(require("ms"));
-const nft = __importStar(require("./types/nftTypes"));
+const nft = __importStar(require("./types/nftTypes.js"));
 const freeDailyQuota = 2;
 setInterval(updateResourceCosts, (0, ms_1.default)("5 minutes"));
 updateResourceCosts();

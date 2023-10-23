@@ -14,7 +14,8 @@ const queries = {
   pomelo: { search: "account:eosio.token action:transfer receiver:app.pomelo data.to:app.pomelo -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee", table: "transfer" },
   pomeloClaim: { search: "account:eosio.token action:transfer receiver:claim.pomelo data.to:animus.inc -data.to:eosio.rex -data.to:eosio.ram -data.to:eosio.ramfee", table: "transfer" },
   regminer: { search: "account:gravyhftdefi action:regminer receiver:gravyhftdefi", table: "blacklist" },
-  grvmine: { search: "account:gravyhftdefi action:mine", table: "blacklist" }
+  grvmine: { search: "account:gravyhftdefi action:mine", table: "blacklist" },
+  webxmine: { search: "account:webxtokenacc action:regminer", table: "blacklist" }
 }
 
 let currentClient = "client1"
@@ -69,7 +70,7 @@ async function runQuery(dfuseQuery:string, cursor:string, low:number, table:stri
           else if (currentClient == "client3") currentClient = "client4"
           else currentClient = "client1"
           await sleep(ms("30s"))
-          res()
+          runQuery(dfuseQuery, cursor, low, table, query)
         } else {
           await sleep(ms("30s"))
           cleanExit()
@@ -140,7 +141,7 @@ async function saveAction({ action, cursor, table, searchString }:ActionQueue) {
     } else if (table == "blacklist") {
       const result = await db.blacklist.upsert({
         where: { account: action.data?.miner },
-        create: { account: action.data?.miner, reason: "Gravy Mining" },
+        create: { account: action.data?.miner, reason: "Mining" },
         update: {}
       })
       console.log(result)
@@ -194,7 +195,7 @@ async function init(name, filter, replay) {
     console.log("Query:", query)
 
     const streamTransfer = `query {
-      searchTransactionsForward(query:"${query}", limit:10 irreversibleOnly:true, lowBlockNum:-500) {
+      searchTransactionsForward(query:"${query}", limit:10 irreversibleOnly:true, lowBlockNum:${low}) {
         results{
           cursor
           trace { id block { num timestamp } matchingActions { seq json receiver name } }

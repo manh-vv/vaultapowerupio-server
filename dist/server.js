@@ -29,7 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const ms_1 = __importDefault(require("ms"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
-const serverActions = __importStar(require("./lib/serverActions"));
+const serverActions = __importStar(require("./lib/serverActions.js"));
 const basicAuth = __importStar(require("express-basic-auth"));
 const istorexit_1 = __importDefault(require("istorexit"));
 const express_blacklist_1 = __importDefault(require("express-blacklist"));

@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const serverActions = __importStar(require("./lib/serverActions"));
+const serverActions = __importStar(require("./lib/serverActions.js"));
 async function init() {
     try {
         const response = await serverActions.loadAccountStakes("imjohnatboid");

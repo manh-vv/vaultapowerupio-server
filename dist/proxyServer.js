@@ -7,6 +7,7 @@ async function init() {
         });
         proxy.register(["api.eospowerup.io"], ["http://localhost:3000"]);
         proxy.register(["ipfs.eospowerup.io"], ["http://localhost:3333"]);
+        proxy.register(["umami.boid.com"], ["http://localhost:4000"]);
         proxy.start();
     }
     catch (error) {

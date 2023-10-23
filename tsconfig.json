@@ -10,6 +10,11 @@
     "src/**/*"
   ],
   "compilerOptions": {
+    "paths": {
+      "lib/*": [
+        "lib/*"
+      ]
+    },
     "jsx": "react",
     "noLib": false,
     "skipLibCheck": true,
@@ -29,7 +34,6 @@
     "allowJs": true,
     "checkJs": true,
     "moduleResolution": "node",
-    // "resolveJsonModule": true,
     "esModuleInterop": true
   }
 }

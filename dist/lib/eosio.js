@@ -7,9 +7,9 @@ exports.pickEndpoint = exports.pickRpc = exports.doAction = exports.getAccount =
 const eosio_1 = require("@greymass/eosio");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const ms_1 = __importDefault(require("ms"));
-const utils_1 = require("./utils");
-const env_1 = __importDefault(require("./env"));
-const db_1 = __importDefault(require("./db"));
+const utils_1 = require("./utils.js");
+const env_1 = __importDefault(require("./env.js"));
+const db_1 = __importDefault(require("./db.js"));
 const eosio_resources_1 = require("@greymass/eosio-resources");
 let client;
 let provider;

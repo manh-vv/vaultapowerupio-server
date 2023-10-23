@@ -3,11 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const eosio_1 = require("./lib/eosio");
+const eosio_1 = require("./lib/eosio.js");
 const ms_1 = __importDefault(require("ms"));
-const env_1 = __importDefault(require("./lib/env"));
+const env_1 = __importDefault(require("./lib/env.js"));
 const eosio_2 = require("@greymass/eosio");
-const eospowerupio_types_1 = require("./lib/types/eospowerupio.types");
+const eospowerupio_types_1 = require("./lib/types/eospowerupio.types.js");
 function shuffle(array) {
     let currentIndex = array.length;
     let temporaryValue;

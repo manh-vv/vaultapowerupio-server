@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = __importDefault(require("discord.js"));
-const db_1 = __importDefault(require("./lib/db"));
-const env_1 = __importDefault(require("./lib/env"));
-const utils_1 = require("./lib/utils");
+const db_1 = __importDefault(require("./lib/db.js"));
+const env_1 = __importDefault(require("./lib/env.js"));
+const utils_1 = require("./lib/utils.js");
 const javascript_time_ago_1 = __importDefault(require("javascript-time-ago"));
 const en_1 = __importDefault(require("javascript-time-ago/locale/en"));
-const serverActions_1 = require("./lib/serverActions");
+const serverActions_1 = require("./lib/serverActions.js");
 const { Menu } = require("discord.js-menu");
 javascript_time_ago_1.default.addDefaultLocale(en_1.default);
 const timeAgo = new javascript_time_ago_1.default("en-US");
