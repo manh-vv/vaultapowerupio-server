@@ -11,7 +11,7 @@ import * as nft from "./types/nftTypes"
 
 export let resourcesCosts:ResourceCosts
 
-const freeDailyQuota = 2
+const freeDailyQuota = 1
 
 setInterval(updateResourceCosts, ms("5 minutes"))
 updateResourceCosts()
@@ -90,12 +90,12 @@ export async function freePowerup(accountName:string | Name, params?:any):Promis
   if (typeof accountName == "string") accountName = Name.from(accountName)
   const blacklisted = await checkBlacklist(accountName)
   if (blacklisted) return { status: "blacklisted", errors: [{ blacklisted: blacklisted.reason }] }
+  if (accountName.toString().includes(".pcash") || accountName.toString().includes(".ftw")) return { status: "blacklisted", errors: [{ blacklisted: "Abuse" }] }
   const recentPowerups = await db.dopowerup.findMany({
     where: {
       receiver: accountName.toString(),
       payer: env.contractAccount.toString(),
-      time: { gte: Date.now() - ms("24hr") },
-      failed: { not: true }
+      time: { gte: Date.now() - ms("24hr") }
     },
     orderBy: { time: "desc" }
   })

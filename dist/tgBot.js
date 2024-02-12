@@ -157,8 +157,8 @@ if (require.main === module) {
 }
 async function displayAd(ctx) {
     return ctx.replyWithPhoto({ source: (0, fs_extra_1.readFileSync)("../images/boidfrontier.jpg") }, {
-        caption: `<strong>Earn rewards on the new Boid Frontier!</strong>
-    <a href="https://frontier.boid.com">frontier.boid.com</a>
+        caption: `<strong>Try the new seamless IBC service from the team behind Boid and EOSPowerup.</strong>
+    <a href="https://antelopex.io">antelopex.io</a>
     `,
         parse_mode: "HTML"
     });

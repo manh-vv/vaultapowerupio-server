@@ -7,9 +7,9 @@ const ms_1 = __importDefault(require("ms"));
 const db_1 = __importDefault(require("./lib/db.js"));
 async function init() {
     try {
-        const oldPowerUps = await db_1.default.dopowerup.deleteMany({ where: { time: { lt: Date.now() - (0, ms_1.default)("48h") } } });
+        const oldPowerUps = await db_1.default.dopowerup.deleteMany({ where: { time: { lt: Date.now() - (0, ms_1.default)("7d") } } });
         console.log("Removed oldPowerUps", oldPowerUps.count);
-        const rpcErrors = await db_1.default.rpcErrors.deleteMany({ where: { time: { lt: Date.now() - (0, ms_1.default)("48h") } } });
+        const rpcErrors = await db_1.default.rpcErrors.deleteMany({ where: { time: { lt: Date.now() - (0, ms_1.default)("7d") } } });
         console.log("Removed rpcErrors", rpcErrors);
     }
     catch (error) {

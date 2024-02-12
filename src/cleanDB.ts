@@ -3,9 +3,9 @@ import ms from "ms"
 import db from "./lib/db"
 async function init() {
   try {
-    const oldPowerUps = await db.dopowerup.deleteMany({ where: { time: { lt: Date.now() - ms("48h") } } })
+    const oldPowerUps = await db.dopowerup.deleteMany({ where: { time: { lt: Date.now() - ms("7d") } } })
     console.log("Removed oldPowerUps", oldPowerUps.count)
-    const rpcErrors = await db.rpcErrors.deleteMany({ where: { time: { lt: Date.now() - ms("48h") } } })
+    const rpcErrors = await db.rpcErrors.deleteMany({ where: { time: { lt: Date.now() - ms("7d") } } })
     console.log("Removed rpcErrors", rpcErrors)
     //   const result = await db.$queryRaw(`
 

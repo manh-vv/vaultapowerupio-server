@@ -36,3 +36,5 @@ ecosystem.config.js
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.env
+.env.json

@@ -34,7 +34,7 @@ const db_1 = __importDefault(require("./db.js"));
 const env_1 = __importDefault(require("./env.js"));
 const ms_1 = __importDefault(require("ms"));
 const nft = __importStar(require("./types/nftTypes.js"));
-const freeDailyQuota = 2;
+const freeDailyQuota = 1;
 setInterval(updateResourceCosts, (0, ms_1.default)("5 minutes"));
 updateResourceCosts();
 async function updateResourceCosts() {
@@ -106,12 +106,13 @@ async function freePowerup(accountName, params) {
     const blacklisted = await checkBlacklist(accountName);
     if (blacklisted)
         return { status: "blacklisted", errors: [{ blacklisted: blacklisted.reason }] };
+    if (accountName.toString().includes(".pcash") || accountName.toString().includes(".ftw"))
+        return { status: "blacklisted", errors: [{ blacklisted: "Abuse" }] };
     const recentPowerups = await db_1.default.dopowerup.findMany({
         where: {
             receiver: accountName.toString(),
             payer: env_1.default.contractAccount.toString(),
-            time: { gte: Date.now() - (0, ms_1.default)("24hr") },
-            failed: { not: true }
+            time: { gte: Date.now() - (0, ms_1.default)("24hr") }
         },
         orderBy: { time: "desc" }
     });
