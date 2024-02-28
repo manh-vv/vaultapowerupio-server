@@ -12,7 +12,7 @@ async function main() {
   log(Object.keys(acctMap).length)
   const abusers = Object.entries(acctMap).filter(([name, num]) => {
     // log(name, num)
-    return num > 10
+    return num > 12
   })
   log(abusers)
   for (const [account, num] of abusers) {

@@ -17,7 +17,7 @@ async function main() {
     }
     (0, console_1.log)(Object.keys(acctMap).length);
     const abusers = Object.entries(acctMap).filter(([name, num]) => {
-        return num > 10;
+        return num > 12;
     });
     (0, console_1.log)(abusers);
     for (const [account, num] of abusers) {

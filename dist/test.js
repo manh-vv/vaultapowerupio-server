@@ -1,33 +1,20 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const serverActions = __importStar(require("./lib/serverActions.js"));
+exports.toObject = void 0;
+const eosio_1 = require("@greymass/eosio");
+const console_1 = require("console");
+const eospowerupio_types_1 = require("./lib/types/eospowerupio.types.js");
+function toObject(data) {
+    return JSON.parse(JSON.stringify(data, (key, value) => typeof value === "bigint"
+        ? value.toString()
+        : value));
+}
+exports.toObject = toObject;
 async function init() {
     try {
-        const response = await serverActions.loadAccountStakes("imjohnatboid");
-        console.log(response);
+        const acct = eosio_1.Name.from("boorad.test");
+        const row = eospowerupio_types_1.AccountRow.from({ balance: "22.2000 TLOS" });
+        (0, console_1.log)(toObject(row));
     }
     catch (error) {
         console.error(error);

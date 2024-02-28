@@ -34,7 +34,7 @@ const db_1 = __importDefault(require("./db.js"));
 const env_1 = __importDefault(require("./env.js"));
 const ms_1 = __importDefault(require("ms"));
 const nft = __importStar(require("./types/nftTypes.js"));
-const freeDailyQuota = 1;
+const freeDailyQuota = 2;
 setInterval(updateResourceCosts, (0, ms_1.default)("5 minutes"));
 updateResourceCosts();
 async function updateResourceCosts() {
@@ -119,7 +119,7 @@ async function freePowerup(accountName, params) {
     console.log("recent Powerups", recentPowerups.length);
     if (recentPowerups.length < freeDailyQuota) {
         const bonusSize = await hasBronzeStake(accountName);
-        const cpu = bonusSize ? 6 : 3;
+        const cpu = bonusSize ? 6 : 1;
         const net = bonusSize ? 40 : 20;
         const result = await doPowerup(env_1.default.contractAccount, accountName, cpu, net);
         if ((result === null || result === void 0 ? void 0 : result.receipts.length) > 0) {

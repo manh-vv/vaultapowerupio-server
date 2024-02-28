@@ -11,7 +11,7 @@ import * as nft from "./types/nftTypes"
 
 export let resourcesCosts:ResourceCosts
 
-const freeDailyQuota = 1
+const freeDailyQuota = 2
 
 setInterval(updateResourceCosts, ms("5 minutes"))
 updateResourceCosts()
@@ -102,7 +102,7 @@ export async function freePowerup(accountName:string | Name, params?:any):Promis
   console.log("recent Powerups", recentPowerups.length)
   if (recentPowerups.length < freeDailyQuota) {
     const bonusSize = await hasBronzeStake(accountName)
-    const cpu = bonusSize ? 6 : 3
+    const cpu = bonusSize ? 6 : 1
     const net = bonusSize ? 40 : 20
     const result = await doPowerup(env.contractAccount, accountName, cpu, net)
     // console.log('DoPowerup Result:', result)
