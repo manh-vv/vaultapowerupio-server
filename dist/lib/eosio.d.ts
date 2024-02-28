@@ -46,7 +46,7 @@ export declare function getInfo(): Promise<any>;
 export declare function getAccount(name: Name): Promise<API.v1.AccountObject>;
 export declare function doAction(name: NameType, data?: {
     [key: string]: any;
-} | null, contract?: NameType, authorization?: PermissionLevel[], keys?: PrivateKey[], retry?: number): Promise<DoActionResponse | null>;
+} | null, contract?: NameType, authorization?: PermissionLevel[], keys?: PrivateKey[], retry?: number, max_cpu_usage_ms?: number): Promise<DoActionResponse | null>;
 export declare function pickRpc(): typeof rpcs[0];
 export declare function pickEndpoint(): string;
 export {};

@@ -46,7 +46,7 @@ async function init() {
     console.log("found", unrewarded.length, "unrewarded rounds")
     for (const round of unrewarded) {
       const data = Rewardround.from({ round_id: round.id })
-      const result = await doAction("rewardround", data, contract).catch(console.error)
+      const result = await doAction("rewardround", data, contract, null, null, null, 30).catch(console.error)
       if (!result) console.error("rewardround erorr", round)
       else {
         if (result.receipts.length == 0) console.error("rewardround erorr:", result.errors)

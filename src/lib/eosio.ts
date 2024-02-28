@@ -175,7 +175,7 @@ export async function getAccount(name:Name):Promise<API.v1.AccountObject> {
   const result = (await safeDo("get_account", name)) as API.v1.AccountObject
   return result
 }
-export async function doAction(name:NameType, data?:{ [key:string]:any } | null, contract?:NameType, authorization?:PermissionLevel[], keys?:PrivateKey[], retry?:number):Promise<DoActionResponse | null> {
+export async function doAction(name:NameType, data?:{ [key:string]:any } | null, contract?:NameType, authorization?:PermissionLevel[], keys?:PrivateKey[], retry?:number, max_cpu_usage_ms = 8):Promise<DoActionResponse | null> {
   // if (typeof name == String())
   if (!data) data = {}
   if (!contract) contract = Name.from(env.contractAccount)
@@ -195,7 +195,7 @@ export async function doAction(name:NameType, data?:{ [key:string]:any } | null,
   const transaction = Transaction.from({
     ...header,
     actions: [action],
-    max_cpu_usage_ms: 8
+    max_cpu_usage_ms
   })
   if (!keys) keys = [env.keys[0]]
 
@@ -212,7 +212,7 @@ export async function doAction(name:NameType, data?:{ [key:string]:any } | null,
   }
   // console.log('Pushing Tx using APIs:', apis.length, apis.map(el => el.endpoint.toString()));
 
-  const timeoutTimer = ms("10s")
+  const timeoutTimer = ms("20s")
   await Promise.all(apis.map(async({ endpoint, rpc }) => {
     return await Promise.race([
       new Promise((res) => {

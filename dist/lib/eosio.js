@@ -162,7 +162,7 @@ async function getAccount(name) {
     return result;
 }
 exports.getAccount = getAccount;
-async function doAction(name, data, contract, authorization, keys, retry) {
+async function doAction(name, data, contract, authorization, keys, retry, max_cpu_usage_ms = 8) {
     if (!data)
         data = {};
     if (!contract)
@@ -177,7 +177,7 @@ async function doAction(name, data, contract, authorization, keys, retry) {
         name,
         data
     });
-    const transaction = eosio_1.Transaction.from(Object.assign(Object.assign({}, header), { actions: [action], max_cpu_usage_ms: 8 }));
+    const transaction = eosio_1.Transaction.from(Object.assign(Object.assign({}, header), { actions: [action], max_cpu_usage_ms }));
     if (!keys)
         keys = [env_1.default.keys[0]];
     const signatures = keys.map(key => key.signDigest(transaction.signingDigest(info.chain_id)));
@@ -188,7 +188,7 @@ async function doAction(name, data, contract, authorization, keys, retry) {
     if (apis.length > 2) {
         apis = apis.splice(0, 4);
     }
-    const timeoutTimer = (0, ms_1.default)("10s");
+    const timeoutTimer = (0, ms_1.default)("20s");
     await Promise.all(apis.map(async ({ endpoint, rpc }) => {
         return await Promise.race([
             new Promise((res) => {

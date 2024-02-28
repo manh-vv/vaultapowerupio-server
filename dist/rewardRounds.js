@@ -49,7 +49,7 @@ async function init() {
         console.log("found", unrewarded.length, "unrewarded rounds");
         for (const round of unrewarded) {
             const data = nftTypes_1.Rewardround.from({ round_id: round.id });
-            const result = await (0, eosio_1.doAction)("rewardround", data, contract).catch(console.error);
+            const result = await (0, eosio_1.doAction)("rewardround", data, contract, null, null, null, 30).catch(console.error);
             if (!result)
                 console.error("rewardround erorr", round);
             else {
