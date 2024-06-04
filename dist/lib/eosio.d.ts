@@ -1,4 +1,4 @@
-import { API, APIClient, Name, PermissionLevel, PrivateKey, NameType } from "@greymass/eosio";
+import { API, APIClient, Name, PermissionLevel, PrivateKey, NameType } from "@wharfkit/antelope";
 declare let client: APIClient;
 export declare let rpcs: Array<{
     endpoint: URL;

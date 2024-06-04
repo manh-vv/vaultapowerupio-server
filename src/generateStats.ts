@@ -1,7 +1,7 @@
 import Mixpanel from "mixpanel"
 import { getFullTable, getAllScopes, safeDo, pickRpc } from "./lib/eosio"
 import env from "./lib/env"
-import { Name } from "@greymass/eosio"
+import { Name } from "@wharfkit/antelope"
 import { AccountRow, WatchlistRow } from "./lib/types/eospowerupio.types"
 import db from "./lib/db"
 import ms from "ms"

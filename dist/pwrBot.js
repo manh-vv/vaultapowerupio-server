@@ -8,11 +8,11 @@ const eosio_1 = require("./lib/eosio.js");
 const ms_1 = __importDefault(require("ms"));
 const utils_1 = require("./lib/utils.js");
 const serverActions_1 = require("./lib/serverActions.js");
-const eosio_2 = require("@greymass/eosio");
+const antelope_1 = require("@wharfkit/antelope");
 const eospowerupio_types_1 = require("./lib/types/eospowerupio.types.js");
 require("dotenv").config();
 async function autoBuyRam(payer, watch) {
-    (0, eosio_1.doAction)("autobuyram", eospowerupio_types_1.Autobuyram.from({ payer, watch_account: watch.account }), null, [eosio_2.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission }), eosio_2.PermissionLevel.from({ actor: env_1.default.contractAccount, permission: "workers" })]);
+    (0, eosio_1.doAction)("autobuyram", eospowerupio_types_1.Autobuyram.from({ payer, watch_account: watch.account }), null, [antelope_1.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission }), antelope_1.PermissionLevel.from({ actor: env_1.default.contractAccount, permission: "workers" })], env_1.default.keys);
 }
 async function getAccountBw(account) {
     const resources = await (0, eosio_1.getAccount)(account);
@@ -65,7 +65,7 @@ async function checkWatchAccount(owner, watch) {
 async function init(owner) {
     try {
         if (owner)
-            owner = eosio_2.Name.from(owner);
+            owner = antelope_1.Name.from(owner);
         console.time("totalRun");
         let owners;
         if (!owner)

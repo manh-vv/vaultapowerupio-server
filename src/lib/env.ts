@@ -1,5 +1,5 @@
 import { readJSONSync } from "fs-extra"
-import { Name, PrivateKey } from "@greymass/eosio"
+import { Name, PrivateKey } from "@wharfkit/antelope"
 require("dotenv").config()
 
 

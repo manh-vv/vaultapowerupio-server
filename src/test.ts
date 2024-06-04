@@ -1,4 +1,4 @@
-import { Name } from "@greymass/eosio"
+import { Name } from "@wharfkit/antelope"
 import * as serverActions from "./lib/serverActions"
 import { log } from "console"
 import { AccountRow } from "lib/types/eospowerupio.types"

@@ -1,4 +1,4 @@
-import { Name } from "@greymass/eosio"
+import { Name } from "@wharfkit/antelope"
 import { accountExists, sleep, checkQuota, freeDailyQuota } from "./lib/utils"
 import { Telegraf, Markup, Context } from "telegraf"
 import { readFileSync } from "fs-extra"

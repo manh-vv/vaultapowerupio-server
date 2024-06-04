@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const eosio_1 = require("./lib/eosio.js");
 const ms_1 = __importDefault(require("ms"));
 const env_1 = __importDefault(require("./lib/env.js"));
-const eosio_2 = require("@greymass/eosio");
+const antelope_1 = require("@wharfkit/antelope");
 const eospowerupio_types_1 = require("./lib/types/eospowerupio.types.js");
 function shuffle(array) {
     let currentIndex = array.length;
@@ -23,16 +23,16 @@ function shuffle(array) {
 }
 async function init() {
     try {
-        const result = await (0, eosio_1.getAllScopes)({ code: env_1.default.contractAccount.toString(), table: eosio_2.Name.from("account") });
+        const result = await (0, eosio_1.getAllScopes)({ code: env_1.default.contractAccount.toString(), table: antelope_1.Name.from("account") });
         console.log("accounts:", result.length);
         console.log("Checking for small balances...");
         for (const account of shuffle(result)) {
             try {
-                const balance = (await (0, eosio_1.getFullTable)({ contract: env_1.default.contractAccount, tableName: eosio_2.Name.from("account"), scope: account }))[0].balance;
+                const balance = (await (0, eosio_1.getFullTable)({ contract: env_1.default.contractAccount, tableName: antelope_1.Name.from("account"), scope: account }))[0].balance;
                 console.log(balance);
                 if (parseFloat(balance) < 0.035) {
                     console.log(account, balance);
-                    const result = await (0, eosio_1.doAction)(eosio_2.Name.from("withdraw"), eospowerupio_types_1.Withdraw.from({ owner: account, quantity: balance, receiver: account }), null, [eosio_2.PermissionLevel.from("eospowerupio@powerup")], [env_1.default.keys[1]]);
+                    const result = await (0, eosio_1.doAction)(antelope_1.Name.from("withdraw"), eospowerupio_types_1.Withdraw.from({ owner: account, quantity: balance, receiver: account }), null, [antelope_1.PermissionLevel.from("eospowerupio@powerup")], [env_1.default.keys[1]]);
                     console.log(result);
                 }
             }

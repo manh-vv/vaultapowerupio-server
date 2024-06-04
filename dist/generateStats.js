@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mixpanel_1 = __importDefault(require("mixpanel"));
 const eosio_1 = require("./lib/eosio.js");
 const env_1 = __importDefault(require("./lib/env.js"));
-const eosio_2 = require("@greymass/eosio");
+const antelope_1 = require("@wharfkit/antelope");
 const eospowerupio_types_1 = require("./lib/types/eospowerupio.types.js");
 const db_1 = __importDefault(require("./lib/db.js"));
 const ms_1 = __importDefault(require("ms"));
@@ -23,14 +23,14 @@ async function updateStats(data) {
         let totalDeposited = 0;
         let i = 0;
         let i2 = 0;
-        const owners = await (0, eosio_1.getAllScopes)({ code: env_1.default.contractAccount, table: eosio_2.Name.from("account") });
+        const owners = await (0, eosio_1.getAllScopes)({ code: env_1.default.contractAccount, table: antelope_1.Name.from("account") });
         stats.owners = owners.length;
         console.log("Owners", stats.owners);
         let getResults = [];
         owners.forEach(async (owner) => {
             getResults.push(new Promise((res, rej) => {
                 setTimeout(async () => {
-                    const result = await (0, eosio_1.getFullTable)({ tableName: eosio_2.Name.from("watchlist"), contract: env_1.default.contractAccount, scope: owner, type: eospowerupio_types_1.WatchlistRow });
+                    const result = await (0, eosio_1.getFullTable)({ tableName: antelope_1.Name.from("watchlist"), contract: env_1.default.contractAccount, scope: owner, type: eospowerupio_types_1.WatchlistRow });
                     totalWatched += result.length;
                     res(null);
                 }, 1410 * i);
@@ -39,7 +39,7 @@ async function updateStats(data) {
             getResults.push(new Promise((res, rej) => {
                 setTimeout(async () => {
                     var _a;
-                    const result = await (0, eosio_1.getFullTable)({ tableName: eosio_2.Name.from("account"), contract: env_1.default.contractAccount, scope: owner, type: eospowerupio_types_1.AccountRow });
+                    const result = await (0, eosio_1.getFullTable)({ tableName: antelope_1.Name.from("account"), contract: env_1.default.contractAccount, scope: owner, type: eospowerupio_types_1.AccountRow });
                     totalDeposited += parseFloat((_a = result[0]) === null || _a === void 0 ? void 0 : _a.balance) || 0;
                     res(null);
                 }, 1000 * i2);
@@ -55,8 +55,8 @@ async function updateStats(data) {
             else
                 rpcErrorStats[error.endpoint] = 1;
         }
-        const eosBal = parseFloat((await (0, eosio_1.getFullTable)({ contract: eosio_2.Name.from("eosio.token"), tableName: eosio_2.Name.from("accounts"), scope: env_1.default.contractAccount }))[0].balance);
-        const internalEOSBal = parseFloat((await (0, eosio_1.getFullTable)({ contract: env_1.default.contractAccount, tableName: eosio_2.Name.from("account"), scope: env_1.default.contractAccount }))[0].balance);
+        const eosBal = parseFloat((await (0, eosio_1.getFullTable)({ contract: antelope_1.Name.from("eosio.token"), tableName: antelope_1.Name.from("accounts"), scope: env_1.default.contractAccount }))[0].balance);
+        const internalEOSBal = parseFloat((await (0, eosio_1.getFullTable)({ contract: env_1.default.contractAccount, tableName: antelope_1.Name.from("account"), scope: env_1.default.contractAccount }))[0].balance);
         const registeredUsers = await db_1.default.user.aggregate({
             _count: { id: true }
         });

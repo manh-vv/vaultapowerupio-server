@@ -10,7 +10,7 @@ import {
   UInt32,
   UInt64,
   UInt8
-} from "@greymass/eosio"
+} from "@wharfkit/antelope"
 
 @Struct.type("balances")
 export class Balances extends Struct {

@@ -1,4 +1,4 @@
-import { Name, NameType } from "@greymass/eosio";
+import { Name, NameType } from "@wharfkit/antelope";
 import { ResourceCosts } from "./eosio.js";
 import { Logpowerup } from "./types/eospowerupio.types.js";
 import { Dopowerup } from "@prisma/client";

@@ -1,4 +1,4 @@
-import { Name } from "@greymass/eosio"
+import { Name } from "@wharfkit/antelope"
 import chalk from "chalk"
 import db from "./db"
 import env from "./env"

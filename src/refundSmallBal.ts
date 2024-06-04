@@ -1,7 +1,7 @@
 import { doAction, getAllScopes, getFullTable } from "./lib/eosio"
 import ms from "ms"
 import env from "./lib/env"
-import { Name, PermissionLevel } from "@greymass/eosio"
+import { Name, PermissionLevel } from "@wharfkit/antelope"
 import { Withdraw } from "./lib/types/eospowerupio.types"
 
 function shuffle(array) {

@@ -7,9 +7,9 @@
   },
   "dependencies": {
     "@dfuse/client": "^0.3.20",
-    "@greymass/eosio": "^0.4.4",
-    "@greymass/eosio-resources": "^0.6.4",
     "@prisma/client": "^3.10.0",
+    "@wharfkit/antelope": "^1.0.7",
+    "@wharfkit/resources": "^1.2.3",
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
     "cache-manager": "^3.4.3",

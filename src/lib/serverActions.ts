@@ -1,8 +1,7 @@
-import { Asset, Name, NameType, PermissionLevel } from "@greymass/eosio"
+import { Asset, Name, NameType, PermissionLevel } from "@wharfkit/antelope"
 import { doAction, getFullTable, getResouceCosts, ResourceCosts } from "./eosio"
 import { Autopowerup, Dopowerup as DoPowerUp, Logpowerup } from "./types/eospowerupio.types"
 import { Dopowerup } from "@prisma/client"
-import * as res from "@greymass/eosio-resources"
 import db from "./db"
 import env from "./env"
 import ms from "ms"
@@ -38,7 +37,7 @@ export async function doAutoPowerup(payer:NameType, watch_account:NameType, cpuQ
   const net_frac = kbToFrac * netQuantityMs
   console.log("Max Payment:", max_payment.toString())
   const params:Autopowerup = Autopowerup.from({ cpu_frac, max_payment, payer, net_frac, watch_account })
-  const results = await doAction("autopowerup", params, null, [PermissionLevel.from({ actor: env.workerAccount, permission: env.workerPermission }), PermissionLevel.from({ actor: env.contractAccount, permission: "workers" })])
+  const results = await doAction("autopowerup", params, null, [PermissionLevel.from({ actor: env.workerAccount, permission: env.workerPermission }), PermissionLevel.from({ actor: env.contractAccount, permission: "workers" })], env.keys)
   return results
 }
 

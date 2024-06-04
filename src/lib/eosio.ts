@@ -1,10 +1,10 @@
-import { API, APIClient, APIProvider, FetchProvider, Name, Action, Transaction, ActionFields, Authority, PermissionLevel, PermissionLevelType, SignedTransaction, PrivateKey, NameType } from "@greymass/eosio"
+import { API, APIClient, APIProvider, FetchProvider, Name, Action, Transaction, ActionFields, Authority, PermissionLevel, PermissionLevelType, SignedTransaction, PrivateKey, NameType } from "@wharfkit/antelope"
 import fetch from "node-fetch"
 import ms from "ms"
 import { shuffle } from "./utils"
 import env from "./env"
 import db from "./db"
-import { Resources } from "@greymass/eosio-resources"
+import { Resources } from "@wharfkit/resources"
 
 let client:APIClient
 let provider:APIProvider
@@ -68,7 +68,7 @@ export async function getResouceCosts(retry?:number):Promise<ResourceCosts | nul
         const kbToFrac = powerup.net.frac_by_kb(sample, 1)
         return { cpuMsCost, netKbCost, msToFrac, kbToFrac } as ResourceCosts
       } catch (error) {
-        console.error("Resource Costs Error:", url, error.toString())
+        console.error("Resource Costs Error:", url, error)
         errorCounter(url, error.toString())
         await sleep(ms("8s"))
         throw (error)

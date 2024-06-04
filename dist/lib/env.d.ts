@@ -1,4 +1,4 @@
-import { Name, PrivateKey } from "@greymass/eosio";
+import { Name, PrivateKey } from "@wharfkit/antelope";
 interface eosioConfig {
     chain: string;
     keys: PrivateKey[];

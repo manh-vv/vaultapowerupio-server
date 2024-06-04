@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkQuota = exports.accountExists = exports.shuffle = exports.cronRunner = exports.sleep = exports.freeDailyQuota = void 0;
-const eosio_1 = require("@greymass/eosio");
+const antelope_1 = require("@wharfkit/antelope");
 const chalk_1 = __importDefault(require("chalk"));
 const db_1 = __importDefault(require("./db.js"));
 const env_1 = __importDefault(require("./env.js"));
 const ms_1 = __importDefault(require("ms"));
-const eosio_2 = require("./eosio.js");
+const eosio_1 = require("./eosio.js");
 exports.freeDailyQuota = 4;
 const sleep = async (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 exports.sleep = sleep;
@@ -51,7 +51,7 @@ async function accountExists(name) {
     if (!validRegex.test(name))
         return false;
     try {
-        const result = await (0, eosio_2.getAccount)(eosio_1.Name.from(name));
+        const result = await (0, eosio_1.getAccount)(antelope_1.Name.from(name));
         if (result)
             return true;
         else

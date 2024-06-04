@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pickEndpoint = exports.pickRpc = exports.doAction = exports.getAccount = exports.getInfo = exports.getFullTable = exports.getAllScopes = exports.safeDo = exports.getResouceCosts = exports.rpcs = void 0;
-const eosio_1 = require("@greymass/eosio");
+const antelope_1 = require("@wharfkit/antelope");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const ms_1 = __importDefault(require("ms"));
 const utils_1 = require("./utils.js");
 const env_1 = __importDefault(require("./env.js"));
 const db_1 = __importDefault(require("./db.js"));
-const eosio_resources_1 = require("@greymass/eosio-resources");
+const resources_1 = require("@wharfkit/resources");
 let client;
 let provider;
 const sleep = async (ms) => await new Promise((resolve) => setTimeout(resolve, ms));
@@ -30,7 +30,7 @@ async function getResouceCosts(retry) {
         const doit = async () => {
             const url = pickRpc().endpoint.toString();
             try {
-                const resources = new eosio_resources_1.Resources({ fetch: node_fetch_1.default, url });
+                const resources = new resources_1.Resources({ fetch: node_fetch_1.default, url });
                 const powerup = await resources.v1.powerup.get_state();
                 const sample = await resources.getSampledUsage();
                 const cpuMsCost = powerup.cpu.price_per_ms(sample, 1);
@@ -40,7 +40,7 @@ async function getResouceCosts(retry) {
                 return { cpuMsCost, netKbCost, msToFrac, kbToFrac };
             }
             catch (error) {
-                console.error("Resource Costs Error:", url, error.toString());
+                console.error("Resource Costs Error:", url, error);
                 errorCounter(url, error.toString());
                 await sleep((0, ms_1.default)("8s"));
                 throw (error);
@@ -166,22 +166,22 @@ async function doAction(name, data, contract, authorization, keys, retry, max_cp
     if (!data)
         data = {};
     if (!contract)
-        contract = eosio_1.Name.from(env_1.default.contractAccount);
+        contract = antelope_1.Name.from(env_1.default.contractAccount);
     if (!authorization)
-        authorization = [eosio_1.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission })];
+        authorization = [antelope_1.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission })];
     const info = await getInfo();
     const header = info.getTransactionHeader();
-    const action = eosio_1.Action.from({
+    const action = antelope_1.Action.from({
         authorization,
         account: contract,
         name,
         data
     });
-    const transaction = eosio_1.Transaction.from(Object.assign(Object.assign({}, header), { actions: [action], max_cpu_usage_ms }));
+    const transaction = antelope_1.Transaction.from(Object.assign(Object.assign({}, header), { actions: [action], max_cpu_usage_ms }));
     if (!keys)
         keys = [env_1.default.keys[0]];
     const signatures = keys.map(key => key.signDigest(transaction.signingDigest(info.chain_id)));
-    const signedTransaction = eosio_1.SignedTransaction.from(Object.assign(Object.assign({}, transaction), { signatures }));
+    const signedTransaction = antelope_1.SignedTransaction.from(Object.assign(Object.assign({}, transaction), { signatures }));
     const receipts = [];
     const errors = [];
     let apis = (0, utils_1.shuffle)([...new Set(exports.rpcs)]);
@@ -231,8 +231,8 @@ function pickEndpoint() {
 }
 exports.pickEndpoint = pickEndpoint;
 exports.rpcs = env_1.default.endpoints.map(el => {
-    provider = new eosio_1.FetchProvider(el.toString(), { fetch: node_fetch_1.default });
-    client = new eosio_1.APIClient({ provider });
+    provider = new antelope_1.FetchProvider(el.toString(), { fetch: node_fetch_1.default });
+    client = new antelope_1.APIClient({ provider });
     return { endpoint: el, rpc: client.v1.chain };
 });
 //# sourceMappingURL=eosio.js.map

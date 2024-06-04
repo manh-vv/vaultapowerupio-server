@@ -3,12 +3,12 @@ import { getAccount, doAction, getFullTable, getResouceCosts, ResourceCosts, get
 import ms from "ms"
 import { shuffle } from "./lib/utils"
 import { doAutoPowerup, resourcesCosts } from "./lib/serverActions"
-import { Name, NameType, PermissionLevel } from "@greymass/eosio"
+import { Name, NameType, PermissionLevel } from "@wharfkit/antelope"
 import { Autobuyram, Autopowerup, WatchlistRow } from "./lib/types/eospowerupio.types"
 require("dotenv").config()
 
 async function autoBuyRam(payer:Name, watch:WatchlistRow) {
-  doAction("autobuyram", Autobuyram.from({ payer, watch_account: watch.account }), null, [PermissionLevel.from({ actor: env.workerAccount, permission: env.workerPermission }), PermissionLevel.from({ actor: env.contractAccount, permission: "workers" })])
+  doAction("autobuyram", Autobuyram.from({ payer, watch_account: watch.account }), null, [PermissionLevel.from({ actor: env.workerAccount, permission: env.workerPermission }), PermissionLevel.from({ actor: env.contractAccount, permission: "workers" })], env.keys)
 }
 
 async function getAccountBw(account:Name) {
