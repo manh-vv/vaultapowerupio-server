@@ -5,7 +5,7 @@ import { Dopowerup } from "@prisma/client";
 import * as nft from "./types/nftTypes.js";
 export declare let resourcesCosts: ResourceCosts;
 export declare function doPowerup(payer: NameType, receiver: NameType, cpuQuantityMs: number, netQuantityMs: number): Promise<import("./eosio.js").DoActionResponse>;
-export declare function doAutoPowerup(payer: NameType, watch_account: NameType, cpuQuantityMs: number, netQuantityMs: number): Promise<import("./eosio.js").DoActionResponse>;
+export declare function doAutoPowerup(payer: NameType, watch_account: NameType, cpuQuantityMs: number, netQuantityMs: number): Promise<any>;
 export interface FreePowerupResult {
     status: "success" | "error" | "reachedFreeQuota" | "blacklisted";
     powerupLog?: Logpowerup;

@@ -37,7 +37,9 @@ export async function doAutoPowerup(payer:NameType, watch_account:NameType, cpuQ
   const net_frac = kbToFrac * netQuantityMs
   console.log("Max Payment:", max_payment.toString())
   const params:Autopowerup = Autopowerup.from({ cpu_frac, max_payment, payer, net_frac, watch_account })
-  const results = await doAction("autopowerup", params, null, [PermissionLevel.from({ actor: env.workerAccount, permission: env.workerPermission }), PermissionLevel.from({ actor: env.contractAccount, permission: "workers" })], env.keys)
+  let results
+  if (env.workerAccount.toString() === "eospowerupio") results = await doAction("autopowerup", params, null, [PermissionLevel.from({ actor: env.workerAccount, permission: env.workerPermission })])
+  else results = await doAction("autopowerup", params, null, [PermissionLevel.from({ actor: env.workerAccount, permission: env.workerPermission }), PermissionLevel.from({ actor: env.contractAccount, permission: "workers" })], env.keys)
   return results
 }
 
@@ -101,7 +103,7 @@ export async function freePowerup(accountName:string | Name, params?:any):Promis
   console.log("recent Powerups", recentPowerups.length)
   if (recentPowerups.length < freeDailyQuota) {
     const bonusSize = await hasBronzeStake(accountName)
-    const cpu = bonusSize ? 6 : 1
+    const cpu = bonusSize ? 4.1 : 1.1
     const net = bonusSize ? 40 : 20
     const result = await doPowerup(env.contractAccount, accountName, cpu, net)
     // console.log('DoPowerup Result:', result)

@@ -58,7 +58,11 @@ async function doAutoPowerup(payer, watch_account, cpuQuantityMs, netQuantityMs)
     const net_frac = kbToFrac * netQuantityMs;
     console.log("Max Payment:", max_payment.toString());
     const params = eospowerupio_types_1.Autopowerup.from({ cpu_frac, max_payment, payer, net_frac, watch_account });
-    const results = await (0, eosio_1.doAction)("autopowerup", params, null, [antelope_1.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission }), antelope_1.PermissionLevel.from({ actor: env_1.default.contractAccount, permission: "workers" })], env_1.default.keys);
+    let results;
+    if (env_1.default.workerAccount.toString() === "eospowerupio")
+        results = await (0, eosio_1.doAction)("autopowerup", params, null, [antelope_1.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission })]);
+    else
+        results = await (0, eosio_1.doAction)("autopowerup", params, null, [antelope_1.PermissionLevel.from({ actor: env_1.default.workerAccount, permission: env_1.default.workerPermission }), antelope_1.PermissionLevel.from({ actor: env_1.default.contractAccount, permission: "workers" })], env_1.default.keys);
     return results;
 }
 exports.doAutoPowerup = doAutoPowerup;
