@@ -27,3 +27,30 @@ If you just want to run a worker, you only need to run pwrBot. You can comment o
 ```bash
 pm2 start ./ecosystem.config.js
 ```
+
+# Setup permission
+
+```log
+eosio::powerup
+eospowerupio::dopowerup
+eospowerupio::dobuyram
+eospowerupio::sxrebalance
+eospowerupio::withdraw
+powerup.nfts::*
+```
+
+```sh
+cleos -u https://jungle4.genereos.io set action permission vaultapwerup eosio powerup powerup
+cleos -u https://jungle4.genereos.io set action permission vaultapwerup core.vaulta powerup powerup
+
+
+cleos -u https://jungle4.genereos.io set action permission vaultapwerup vaultapwerup dobuyram powerup
+cleos -u https://jungle4.genereos.io set action permission vaultapwerup vaultapwerup sxrebalance powerup
+cleos -u https://jungle4.genereos.io set action permission vaultapwerup vaultapwerup withdraw powerup
+
+cleos -u https://jungle4.genereos.io set action permission powerup.nfts powerup.nfts * powerup
+
+cleos -u https://jungle4.genereos.io set action permission vaultapwerup vaultapwerup autopowerup workers
+cleos -u https://jungle4.genereos.io set action permission vaultapwerup vaultapwerup autobuyram workers
+cleos -u https://jungle4.genereos.io set action permission vaultapwerup vaultapwerup dopowerup workers
+```
