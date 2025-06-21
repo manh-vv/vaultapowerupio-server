@@ -1,5 +1,3 @@
-import { Sql } from "@prisma/client/runtime"
-import ms from "ms"
 import db from "../lib/db"
 async function init() {
   try {

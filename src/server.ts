@@ -9,7 +9,6 @@ import blacklist from "express-blacklist"
 
 import ExpressCache from "express-cache-middleware"
 import cacheManager from "cache-manager"
-import { exit } from "process"
 const app = express()
 let cors = require("cors")
 app.set("trust proxy", 1)
