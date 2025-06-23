@@ -66,6 +66,7 @@ export async function getResouceCosts(retry?:number):Promise<ResourceCosts | nul
         const netKbCost = powerup.net.price_per_kb(sample, 1)
         const msToFrac = powerup.cpu.frac_by_ms(sample, 1)
         const kbToFrac = powerup.net.frac_by_kb(sample, 1)
+        console.log("Resource Costs:", url, { cpuMsCost, netKbCost, msToFrac, kbToFrac })
         return { cpuMsCost, netKbCost, msToFrac, kbToFrac } as ResourceCosts
       } catch (error) {
         console.error("Resource Costs Error:", url, error)
@@ -92,7 +93,7 @@ export async function safeDo(cb:string, params?:any, retry?:number):Promise<any 
   if (!retry) retry = 0
   const rpc = pickRpc()
   const url = rpc.endpoint.toString()
-  console.log("Try rpc:", url)
+  console.log("safeDo:: Try rpc:", url, cb, params && JSON.stringify(params), retry)
 
   try {
     const doit = async() => {
@@ -185,6 +186,12 @@ export async function doAction(name:NameType, data?:{ [key:string]:any } | null,
   const info = await getInfo()
   const header = info.getTransactionHeader()
   const action = Action.from({
+    authorization,
+    account: contract,
+    name,
+    data
+  })
+  console.log("doAction::", {
     authorization,
     account: contract,
     name,

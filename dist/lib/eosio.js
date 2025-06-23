@@ -37,6 +37,7 @@ async function getResouceCosts(retry) {
                 const netKbCost = powerup.net.price_per_kb(sample, 1);
                 const msToFrac = powerup.cpu.frac_by_ms(sample, 1);
                 const kbToFrac = powerup.net.frac_by_kb(sample, 1);
+                console.log("Resource Costs:", url, { cpuMsCost, netKbCost, msToFrac, kbToFrac });
                 return { cpuMsCost, netKbCost, msToFrac, kbToFrac };
             }
             catch (error) {
@@ -69,7 +70,7 @@ async function safeDo(cb, params, retry) {
         retry = 0;
     const rpc = pickRpc();
     const url = rpc.endpoint.toString();
-    console.log("Try rpc:", url);
+    console.log("safeDo:: Try rpc:", url, cb, params && JSON.stringify(params), retry);
     try {
         const doit = async () => {
             try {
@@ -172,6 +173,12 @@ async function doAction(name, data, contract, authorization, keys, retry, max_cp
     const info = await getInfo();
     const header = info.getTransactionHeader();
     const action = antelope_1.Action.from({
+        authorization,
+        account: contract,
+        name,
+        data
+    });
+    console.log("doAction::", {
         authorization,
         account: contract,
         name,

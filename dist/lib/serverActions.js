@@ -122,7 +122,7 @@ async function freePowerup(accountName, params) {
     });
     console.log("recent Powerups", recentPowerups.length);
     if (recentPowerups.length < freeDailyQuota) {
-        const bonusSize = await hasBronzeStake(accountName);
+        const bonusSize = true;
         const cpu = bonusSize ? 4.1 : 1.1;
         const net = bonusSize ? 40 : 20;
         const result = await doPowerup(env_1.default.contractAccount, accountName, cpu, net);
